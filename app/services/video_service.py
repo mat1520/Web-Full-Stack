@@ -1,6 +1,9 @@
 from typing import Dict, List
 from urllib.parse import unquote
+import logging
 import time
+
+logger = logging.getLogger(__name__)
 
 from fastapi import HTTPException, status
 from sqlmodel import Session, select, col, func
@@ -102,8 +105,8 @@ class VideoService:
             thumb_key = unquote(video.thumbnail_url.split(".amazonaws.com/")[-1])
             s3.delete_object(video_key)
             s3.delete_object(thumb_key)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to delete S3 files for video %s: %s", video.id, exc)
 
     def delete_video(self, s3: S3Service, video_id: int, user_id: int) -> None:
         video = self.get_video_detail(video_id)
@@ -117,7 +120,3 @@ class VideoService:
 
         self.session.delete(video)
         self.session.commit()
-
-
-def get_video_service(session: Session) -> VideoService:
-    return VideoService(session)

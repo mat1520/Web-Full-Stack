@@ -66,25 +66,6 @@ class S3Service:
 
         return public_url
 
-    def list_objects(self, prefix: str = "") -> list[dict]:
-        try:
-            response = self._client.list_objects_v2(
-                Bucket=self._bucket, Prefix=prefix
-            )
-            return [
-                {
-                    "key": obj["Key"],
-                    "size": obj["Size"],
-                    "last_modified": obj["LastModified"],
-                }
-                for obj in response.get("Contents", [])
-            ]
-        except ClientError as exc:
-            logger.error(
-                "Failed to list objects with prefix '%s': %s", prefix, exc
-            )
-            raise
-
     def delete_object(self, key: str) -> None:
         try:
             self._client.delete_object(Bucket=self._bucket, Key=key)
@@ -93,23 +74,7 @@ class S3Service:
             logger.error("Failed to delete s3://%s/%s: %s", self._bucket, key, exc)
             raise
 
-    def purge_bucket(self) -> int:
-        deleted = 0
-        paginator = self._client.get_paginator("list_objects_v2")
-        for page in paginator.paginate(Bucket=self._bucket):
-            objects = page.get("Contents", [])
-            if not objects:
-                continue
-            batch = [{"Key": obj["Key"]} for obj in objects]
-            self._client.delete_objects(
-                Bucket=self._bucket,
-                Delete={"Objects": batch, "Quiet": True},
-            )
-            deleted += len(batch)
-            logger.info("Purged %d objects from s3://%s", len(batch), self._bucket)
-        logger.info("Total purged: %d objects", deleted)
-        return deleted
-
 
 def get_s3_service() -> S3Service:
     return S3Service(get_settings())
+

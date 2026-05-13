@@ -115,10 +115,8 @@
   };
 
   const api = {
-    getVideos: (cat) =>
-      request(`/videos${cat ? `?category=${encodeURIComponent(cat)}` : ""}`),
     getVideo: (id) => request(`/videos/${id}`),
-    getRandomPicks: () => request("/videos/random-picks"),
+    getRandomPicks: () => request(`/videos/random-picks?_=${Date.now()}`),
     deleteVideo: (id) => request(`/videos/${id}`, { method: "DELETE" }),
     postComment: (data) => request("/comments", { method: "POST", body: data }),
     authRequest: (ep, data) =>
@@ -435,14 +433,22 @@
     state.currentVideo = null;
     updateOwnershipUI();
 
-    if (state.videos.length > 0) return filterByCategory(state.activeCategory);
-
     clear(dom.videoGrid);
     for (let i = 0; i < 8; i++)
       dom.videoGrid.appendChild(clone("tmpl-skeleton"));
 
     try {
-      state.videos = await api.getVideos();
+      const picks = await api.getRandomPicks();
+      state.recommendations = picks;
+      const seen = new Set();
+      state.videos = Object.values(picks)
+        .flat()
+        .filter((v) => {
+          if (seen.has(v.id)) return false;
+          seen.add(v.id);
+          return true;
+        })
+        .sort(() => 0.5 - Math.random());
       renderCategoryFilter(state.videos);
       filterByCategory(state.activeCategory);
     } catch {

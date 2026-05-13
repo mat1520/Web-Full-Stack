@@ -17,6 +17,23 @@ router = APIRouter(prefix="/videos", tags=["Videos"])
 ALLOWED_VIDEO = {"video/mp4", "video/webm", "video/quicktime"}
 ALLOWED_IMAGE = {"image/jpeg", "image/png", "image/webp"}
 
+MAGIC_SIGNATURES = {
+    b"\x00\x00\x00": "video/mp4",
+    b"\x1a\x45\xdf\xa3": "video/webm",
+    b"\xff\xd8\xff": "image/jpeg",
+    b"\x89PNG": "image/png",
+    b"RIFF": "image/webp",
+}
+
+
+def _validate_file_signature(file: UploadFile, allowed: set[str]) -> None:
+    header = file.file.read(12)
+    file.file.seek(0)
+    for magic, mime in MAGIC_SIGNATURES.items():
+        if header.startswith(magic) and mime in allowed:
+            return
+    raise HTTPException(400, f"El archivo no coincide con un formato permitido")
+
 
 def _safe_key(name: str) -> str:
     clean = re.sub(r'[<>:"/\\|?*\']', "", name)
@@ -67,6 +84,9 @@ def upload_video(
 
     if thumbnail_file.content_type not in ALLOWED_IMAGE:
         raise HTTPException(400, "Formato de imagen no soportado (jpg, png, webp)")
+
+    _validate_file_signature(video_file, ALLOWED_VIDEO)
+    _validate_file_signature(thumbnail_file, ALLOWED_IMAGE)
 
     safe_name = _safe_key(title)
     video_ext = video_file.filename.rsplit(".", 1)[-1] if "." in video_file.filename else "mp4"
