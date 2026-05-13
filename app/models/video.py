@@ -6,6 +6,7 @@ from sqlmodel import SQLModel, Field, Relationship
 if TYPE_CHECKING:
     from app.models.comment import Comment
     from app.models.user import User
+    from app.models.category import Category
 
 
 class Video(SQLModel, table=True):
@@ -14,7 +15,7 @@ class Video(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str = Field(max_length=200, index=True)
     description: str = Field(max_length=2000, default="")
-    category: str = Field(max_length=50, index=True)
+    category_id: int | None = Field(default=None, foreign_key="categories.id", index=True)
     video_url: str = Field(max_length=500)
     thumbnail_url: str = Field(max_length=500)
     duration: str = Field(max_length=10, default="00:00")
@@ -28,3 +29,4 @@ class Video(SQLModel, table=True):
 
     comments: list["Comment"] = Relationship(back_populates="video")
     owner: Optional["User"] = Relationship(back_populates="videos")
+    category: Optional["Category"] = Relationship(back_populates="videos")
