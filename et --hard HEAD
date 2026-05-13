@@ -1,0 +1,10 @@
+[33m6cf3b89[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m feat: implement frontend application logic for authentication, video uploading, and comment management
+[33mac79bc5[m feat: implement base styles and dark theme design system
+[33m852b17a[m feat: add HTML structure for video streaming platform including gallery, detail view, auth modals, and upload interface
+[33mdefb58e[m chore: add streaming.db to project and remove database file extensions from gitignore
+[33mca618bb[m chore: ignore .vercel directory in frontend project
+[33m234b0b0[m connect frontend to railway backend
+[33md7daa70[m chore: add python version configuration and vercel rewrite rules for backend proxying
+[33m7cc3849[m chore: add Railway configuration and Vercel proxy rewrite rules for backend integration
+[33m8d5c458[m chore: configure Procfile for uvicorn deployment and add Vercel rewrite rules for API routing
+[33mde67361[m feat: add global styles and component-specific CSS for the frontend layout
