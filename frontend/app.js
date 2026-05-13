@@ -4,7 +4,6 @@
   const API = "/api/v1";
   const $ = (id) => document.getElementById(id);
 
-  /* ── DOM refs ── */
   const dom = {
     homeView: $("home-view"), detailView: $("detail-view"), uploadView: $("upload-view"),
     videoGrid: $("video-grid"), categoryList: $("category-list"),
@@ -37,7 +36,6 @@
     hamburgerBtn: $("hamburger-btn"), headerMenu: $("header-menu"),
   };
 
-  /* ── State ── */
   const state = {
     videos: [], currentVideo: null, activeCategory: null,
     recommendations: {},
@@ -46,7 +44,6 @@
     authMode: "login",
   };
 
-  /* ── Helpers ── */
   const clear = (el) => { while (el.firstChild) el.removeChild(el.firstChild) };
   const clone = (id) => $(id).content.cloneNode(true);
   const hide = (el) => el.classList.add("view--hidden");
@@ -71,7 +68,6 @@
     toastTimer = setTimeout(() => (dom.toast.className = "toast"), 3500);
   };
 
-  /* ── API layer ── */
   const request = async (endpoint, opts = {}) => {
     const headers = opts.headers || {};
     if (state.token && !opts.noAuth) headers["Authorization"] = `Bearer ${state.token}`;
@@ -107,7 +103,6 @@
     }),
   };
 
-  /* ── Auth helpers ── */
   const saveSession = (data) => {
     state.token = data.access_token;
     state.user = data.user;
@@ -133,7 +128,6 @@
       !(state.currentVideo && state.user && state.currentVideo.owner_id === state.user.id));
   };
 
-  /* ── Auth modal ── */
   const openAuthModal = (mode) => {
     state.authMode = mode;
     dom.authForm.reset();
@@ -153,7 +147,6 @@
     dom.modalAuth.showModal();
   };
 
-  /* ── Form handlers ── */
   const handleAuth = async (e) => {
     e.preventDefault();
     hide(dom.authError);
@@ -251,7 +244,6 @@
     finally { dom.confirmOk.disabled = false }
   };
 
-  /* ── Render helpers ── */
   const renderState = (container, msg, retryFn) => {
     clear(container);
     const s = document.createElement("section");
@@ -299,7 +291,6 @@
     return f;
   };
 
-  /* ── Category filter ── */
   const renderCategories = (videos) => {
     const cats = new Set(videos.map((v) => v.category));
     clear(dom.categoryList);
@@ -336,7 +327,6 @@
     dom.videoGrid.appendChild(frag);
   };
 
-  /* ── Views ── */
   const VIEWS = [dom.homeView, dom.detailView, dom.uploadView];
   const switchView = (active, showBack) => {
     VIEWS.forEach((v) => v.classList.add("view--hidden"));
@@ -438,7 +428,6 @@
     hide(dom.uploadError);
   };
 
-  /* ── Drag & drop ── */
   const initDrop = () => {
     const pd = (e) => { e.preventDefault(); e.stopPropagation() };
     ["dragenter", "dragover", "dragleave", "drop"].forEach((e) => dom.dropZone.addEventListener(e, pd));
@@ -454,7 +443,6 @@
     });
   };
 
-  /* ── Router ── */
   const navigateTo = (path) => (window.location.hash = path);
   const resolveRoute = () => {
     const hash = window.location.hash.slice(1);
@@ -463,7 +451,6 @@
     showHome();
   };
 
-  /* ── Init ── */
   document.addEventListener("DOMContentLoaded", () => {
     const closeMenu = () => {
       dom.hamburgerBtn.classList.remove("header__hamburger--open");
