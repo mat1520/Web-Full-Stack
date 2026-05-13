@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (() => {
   const API = "/api/v1";
@@ -77,7 +77,7 @@
     }
     const res = await fetch(`${API}${endpoint}`, { ...opts, headers });
     if (!res.ok) {
-      let err = "Error de conexión";
+      let err = "Error de conexiÃ³n";
       try { err = (await res.json()).detail || `Error ${res.status}` } catch {}
       throw new Error(err);
     }
@@ -133,15 +133,15 @@
     dom.authForm.reset();
     hide(dom.authError);
     const isReg = mode === "register";
-    dom.modalTitle.textContent = isReg ? "Crear Cuenta" : "Iniciar Sesión";
+    dom.modalTitle.textContent = isReg ? "Crear Cuenta" : "Iniciar SesiÃ³n";
     toggle(dom.fieldEmail, isReg);
     dom.authSubmit.textContent = isReg ? "Registrarse" : "Entrar";
     clear(dom.modalSwitch);
-    dom.modalSwitch.appendChild(document.createTextNode(isReg ? "¿Ya tienes cuenta? " : "¿No tienes cuenta? "));
+    dom.modalSwitch.appendChild(document.createTextNode(isReg ? "Â¿Ya tienes cuenta? " : "Â¿No tienes cuenta? "));
     const link = document.createElement("button");
     link.className = "modal__switch-link";
     link.type = "button";
-    link.textContent = isReg ? "Inicia Sesión" : "Regístrate";
+    link.textContent = isReg ? "Inicia SesiÃ³n" : "RegÃ­strate";
     link.onclick = () => openAuthModal(isReg ? "login" : "register");
     dom.modalSwitch.appendChild(link);
     dom.modalAuth.showModal();
@@ -203,7 +203,7 @@
 
   const handleComment = async (e) => {
     e.preventDefault();
-    if (!state.user) return showToast("Inicia sesión primero", "error");
+    if (!state.user) return showToast("Inicia sesiÃ³n primero", "error");
     const content = dom.commentContent.value.trim();
     if (!content) return dom.commentContent.focus();
 
@@ -321,7 +321,7 @@
     setActiveCategory(cat);
     const list = cat ? state.videos.filter((v) => v.category === cat) : state.videos;
     clear(dom.videoGrid);
-    if (!list.length) return renderState(dom.videoGrid, "No hay videos en esta categoría");
+    if (!list.length) return renderState(dom.videoGrid, "No hay videos en esta categorÃ­a");
     const frag = document.createDocumentFragment();
     list.forEach((v) => frag.appendChild(renderCard(v, "tmpl-video-card")));
     dom.videoGrid.appendChild(frag);
@@ -354,7 +354,7 @@
       filterByCategory(state.activeCategory);
     } catch {
       renderState(dom.videoGrid, "Error al cargar los videos", showHome);
-      showToast("Error de conexión", "error");
+      showToast("Error de conexiÃ³n", "error");
     }
   };
 
@@ -388,7 +388,7 @@
 
       dom.commentsCount.textContent = `(${v.comments.length})`;
       if (!v.comments.length) {
-        renderState(dom.commentsList, "Sé el primero en comentar");
+        renderState(dom.commentsList, "SÃ© el primero en comentar");
       } else {
         const frag = document.createDocumentFragment();
         v.comments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -419,10 +419,10 @@
   };
 
   const showUpload = () => {
-    if (!state.token) { showToast("Inicia sesión para subir videos", "error"); return navigateTo("/") }
+    if (!state.token) { showToast("Inicia sesiÃ³n para subir videos", "error"); return navigateTo("/") }
     switchView(dom.uploadView, true);
     dom.uploadForm.reset();
-    dom.fileNameVideo.textContent = "Ningún video";
+    dom.fileNameVideo.textContent = "NingÃºn video";
     dom.fileNameThumb.textContent = "Ninguna miniatura";
     hide(dom.uploadProgress);
     hide(dom.uploadError);
@@ -474,11 +474,11 @@
     dom.commentForm.onsubmit = handleComment;
     dom.btnPromptLogin.onclick = dom.btnLogin.onclick = () => openAuthModal("login");
     dom.btnRegister.onclick = () => openAuthModal("register");
-    dom.btnLogout.onclick = () => { clearSession(); showToast("Sesión cerrada", "success") };
+    dom.btnLogout.onclick = () => { clearSession(); showToast("SesiÃ³n cerrada", "success") };
     dom.modalClose.onclick = () => dom.modalAuth.close();
     dom.authForm.onsubmit = handleAuth;
     dom.btnUploadOpen.onclick = () => {
-      if (!state.token) return showToast("Inicia sesión para subir videos", "error");
+      if (!state.token) return showToast("Inicia sesiÃ³n para subir videos", "error");
       navigateTo("/upload");
     };
     dom.uploadForm.onsubmit = handleUpload;
