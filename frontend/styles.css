@@ -101,15 +101,7 @@ a:hover {
 section:not(.view--hidden) {
   animation: fadeIn 0.4s var(--ease);
 }
-.flex-row {
-  display: flex;
-  align-items: center;
-}
-.flex-col {
-  display: flex;
-  flex-direction: column;
-}
-.glass,
+
 .header {
   background: rgba(12, 12, 14, 0.65);
   backdrop-filter: blur(16px);
@@ -560,7 +552,6 @@ section:not(.view--hidden) {
   border-radius: var(--radius-lg);
   color: var(--text-primary);
   max-width: 90vw;
-  width: 400px;
 }
 .glass-modal[open] {
   animation: modalPop 0.3s var(--ease) forwards;
@@ -571,15 +562,20 @@ section:not(.view--hidden) {
 }
 .modal__content {
   background: rgba(20, 20, 22, 0.85);
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  width: 400px;
+  max-width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 .modal__content--wide {
-  width: 500px;
+  width: 480px;
+  gap: 1rem;
 }
 .modal__header {
   display: flex;
@@ -618,7 +614,7 @@ section:not(.view--hidden) {
   color: var(--text-secondary);
 }
 .modal__textarea {
-  min-height: 80px;
+  min-height: 60px;
   resize: vertical;
 }
 .modal__submit {
@@ -667,8 +663,8 @@ section:not(.view--hidden) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  padding: 2.5rem 1.5rem;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
   border: 2px dashed rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-md);
   background: rgba(26, 26, 30, 0.4);
@@ -689,6 +685,7 @@ section:not(.view--hidden) {
 }
 .drop-zone__inputs {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   width: 100%;
 }
@@ -699,19 +696,14 @@ section:not(.view--hidden) {
   gap: 0.5rem;
 }
 .drop-zone__file {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
+  display: none;
 }
 .drop-zone__btn {
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem !important;
+  padding: 0.75rem;
   width: 100%;
 }
 .drop-zone__name {
@@ -817,10 +809,7 @@ section:not(.view--hidden) {
   grid-column: 1 / -1;
   animation: fadeIn 0.5s;
 }
-.state-msg__icon {
-  font-size: 2.5rem;
-  opacity: 0.5;
-}
+
 .state-msg__text {
   color: var(--text-secondary);
   font-size: 1rem;

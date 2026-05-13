@@ -331,7 +331,7 @@
     clear(container);
     const section = document.createElement("section");
     section.className = "state-msg";
-    section.innerHTML = `<span class="state-msg__icon"></span><p class="state-msg__text">${msg}</p>`;
+    section.innerHTML = `<p class="state-msg__text">${msg}</p>`;
     if (retryFn) {
       const btn = document.createElement("button");
       btn.className = "state-msg__retry";
@@ -571,6 +571,8 @@
     dom.btnUploadOpen.onclick = () =>
       state.token
         ? (dom.uploadForm.reset(),
+          dom.fileNameVideo.textContent = "Ningun video",
+          dom.fileNameThumb.textContent = "Ninguna miniatura",
           dom.uploadProgress.classList.add("view--hidden"),
           dom.uploadError.classList.add("view--hidden"),
           dom.modalUpload.showModal())
