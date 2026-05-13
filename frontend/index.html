@@ -1,385 +1,268 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Plataforma de streaming de video universitaria — UIDE"
-    />
-    <meta name="theme-color" content="#0c0c0e" />
-    <link rel="icon" href="data:," />
-    <title>StreamCore — Video Streaming Platform</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="header">
-      <nav class="header__inner" aria-label="Navegación principal">
-        <a
-          class="header__brand"
-          id="brand-link"
-          href="#/"
-          aria-label="Ir al inicio"
-        >
-          StreamCore
-        </a>
-        <button
-          class="header__back"
-          id="back-btn"
-          aria-label="Volver a la galería"
-        >
-          ← Galería
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Plataforma de streaming de video universitaria — UIDE" />
+  <meta name="theme-color" content="#0c0c0e" />
+  <link rel="icon" href="data:," />
+  <title>StreamCore — Video Streaming Platform</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="header">
+    <nav class="header__inner" aria-label="Navegación principal">
+      <a class="header__brand" id="brand-link" href="#/" aria-label="Ir al inicio">
+        StreamCore
+      </a>
+      <button class="header__back" id="back-btn" aria-label="Volver a la galería">
+        ← Galería
+      </button>
+      <span class="header__spacer"></span>
+      <section class="header__auth" id="auth-section">
+        <button class="header__auth-btn" id="btn-login">
+          Iniciar Sesión
         </button>
-        <span class="header__spacer"></span>
-        <section class="header__auth" id="auth-section">
-          <button class="header__auth-btn" id="btn-login">
-            Iniciar Sesión
-          </button>
-          <button
-            class="header__auth-btn header__auth-btn--accent"
-            id="btn-register"
-          >
-            Registro
-          </button>
-        </section>
-        <section class="header__user view--hidden" id="user-section">
-          <span class="header__username" id="header-username"></span>
-          <button
-            class="header__auth-btn header__auth-btn--accent"
-            id="btn-upload-open"
-          >
-            Subir Video
-          </button>
-          <button class="header__auth-btn" id="btn-logout">Salir</button>
-        </section>
-      </nav>
-    </header>
+        <button class="header__auth-btn header__auth-btn--accent" id="btn-register">
+          Registro
+        </button>
+      </section>
+      <section class="header__user view--hidden" id="user-section">
+        <span class="header__username" id="header-username"></span>
+        <button class="header__auth-btn header__auth-btn--accent" id="btn-upload-open">
+          Subir Video
+        </button>
+        <button class="header__auth-btn" id="btn-logout">Salir</button>
+      </section>
+    </nav>
+  </header>
 
-    <section id="home-view">
-      <nav class="category-filter" aria-label="Filtros de categoría">
-        <ul
-          class="category-filter__list"
-          id="category-list"
-          role="tablist"
-        ></ul>
-      </nav>
-      <main
-        class="video-grid"
-        id="video-grid"
-        aria-label="Galería de videos"
-      ></main>
-    </section>
+  <section id="home-view">
+    <nav class="category-filter" aria-label="Filtros de categoría">
+      <ul class="category-filter__list" id="category-list" role="tablist"></ul>
+    </nav>
+    <main class="video-grid" id="video-grid" aria-label="Galería de videos"></main>
+  </section>
 
-    <section id="detail-view" class="view--hidden">
-      <article class="detail">
-        <section class="player">
-          <figure class="player__figure">
-            <video
-              class="player__video"
-              id="main-video"
-              controls
-              preload="auto"
-              playsinline
-            >
-              Tu navegador no soporta video HTML5.
-            </video>
-          </figure>
-          <header class="player__info">
-            <div class="player__title-row">
-              <h1 class="player__title" id="player-title"></h1>
-              <button
-                class="player__delete view--hidden"
-                id="btn-delete-video"
-                aria-label="Eliminar video"
-              >
-                Eliminar
-              </button>
-            </div>
-            <p class="player__meta" id="player-meta"></p>
-            <p class="player__description" id="player-description"></p>
-          </header>
-        </section>
-
-        <section class="comments" aria-label="Comentarios">
-          <h2 class="comments__header">
-            Comentarios
-            <span class="comments__count" id="comments-count"></span>
-          </h2>
-
-          <form class="comment-form view--hidden" id="comment-form">
-            <textarea
-              class="comment-form__textarea"
-              id="comment-content"
-              placeholder="Escribe un comentario..."
-              maxlength="1000"
-              required
-              aria-label="Contenido del comentario"
-            ></textarea>
-            <footer class="comment-form__actions">
-              <button class="comment-form__submit" type="submit">
-                Comentar
-              </button>
-            </footer>
-          </form>
-          <div class="comment-auth-prompt" id="comment-auth-prompt">
-            <p>Inicia sesión para poder comentar.</p>
-            <button
-              class="header__auth-btn header__auth-btn--accent"
-              id="btn-prompt-login"
-            >
-              Iniciar Sesión
+  <section id="detail-view" class="view--hidden">
+    <article class="detail">
+      <section class="player">
+        <figure class="player__figure">
+          <video class="player__video" id="main-video" controls preload="auto" playsinline>
+            Tu navegador no soporta video HTML5.
+          </video>
+        </figure>
+        <header class="player__info">
+          <div class="player__title-row">
+            <h1 class="player__title" id="player-title"></h1>
+            <button class="player__delete view--hidden" id="btn-delete-video" aria-label="Eliminar video">
+              Eliminar
             </button>
           </div>
-
-          <ol class="comments__list" id="comments-list"></ol>
-        </section>
-
-        <aside class="sidebar" aria-label="Videos recomendados">
-          <h3 class="sidebar__title">Recomendaciones</h3>
-          <nav class="sidebar__list" id="sidebar-list"></nav>
-        </aside>
-      </article>
-    </section>
-
-    <dialog
-      class="modal glass-modal"
-      id="modal-auth"
-      aria-label="Autenticación"
-    >
-      <section class="modal__content">
-        <header class="modal__header">
-          <h2 class="modal__title" id="modal-title">Iniciar Sesión</h2>
-          <button class="modal__close" id="modal-close" aria-label="Cerrar">
-            ✕
-          </button>
+          <p class="player__meta" id="player-meta"></p>
+          <p class="player__description" id="player-description"></p>
         </header>
-        <form class="modal__form" id="auth-form">
-          <fieldset class="modal__fieldset" id="field-username">
-            <label class="modal__label" for="auth-username">Usuario</label>
-            <input
-              class="modal__input"
-              id="auth-username"
-              type="text"
-              maxlength="50"
-              required
-              autocomplete="username"
-            />
-          </fieldset>
-          <fieldset class="modal__fieldset view--hidden" id="field-email">
-            <label class="modal__label" for="auth-email">Email</label>
-            <input
-              class="modal__input"
-              id="auth-email"
-              type="email"
-              maxlength="100"
-              autocomplete="email"
-            />
-          </fieldset>
-          <fieldset class="modal__fieldset">
-            <label class="modal__label" for="auth-password">Contraseña</label>
-            <input
-              class="modal__input"
-              id="auth-password"
-              type="password"
-              minlength="6"
-              required
-              autocomplete="current-password"
-            />
-          </fieldset>
-          <p class="modal__error view--hidden" id="auth-error"></p>
-          <button class="modal__submit" type="submit" id="auth-submit">
-            Entrar
-          </button>
-        </form>
-        <footer class="modal__footer">
-          <p class="modal__switch" id="modal-switch"></p>
-        </footer>
       </section>
-    </dialog>
 
-    <dialog
-      class="modal glass-modal"
-      id="modal-upload"
-      aria-label="Subir video"
-    >
-      <section class="modal__content modal__content--wide">
-        <header class="modal__header">
-          <h2 class="modal__title">Subir Video</h2>
-          <button class="modal__close" id="upload-close" aria-label="Cerrar">
-            ✕
+      <section class="comments" aria-label="Comentarios">
+        <h2 class="comments__header">
+          Comentarios
+          <span class="comments__count" id="comments-count"></span>
+        </h2>
+
+        <form class="comment-form view--hidden" id="comment-form">
+          <textarea class="comment-form__textarea" id="comment-content" placeholder="Escribe un comentario..."
+            maxlength="1000" required aria-label="Contenido del comentario"></textarea>
+          <footer class="comment-form__actions">
+            <button class="comment-form__submit" type="submit">
+              Comentar
+            </button>
+          </footer>
+        </form>
+        <div class="comment-auth-prompt" id="comment-auth-prompt">
+          <p>Inicia sesión para poder comentar.</p>
+          <button class="header__auth-btn header__auth-btn--accent" id="btn-prompt-login">
+            Iniciar Sesión
           </button>
-        </header>
-        <form
-          class="modal__form"
-          id="upload-form"
-          enctype="multipart/form-data"
-          novalidate
-        >
-          <fieldset class="modal__fieldset">
-            <label class="modal__label" for="upload-title">Título</label>
-            <input
-              class="modal__input"
-              id="upload-title"
-              type="text"
-              maxlength="200"
-              required
-            />
-          </fieldset>
-          <fieldset class="modal__fieldset">
-            <label class="modal__label" for="upload-desc">Descripción</label>
-            <textarea
-              class="modal__input modal__textarea"
-              id="upload-desc"
-              maxlength="2000"
-            ></textarea>
-          </fieldset>
-          <fieldset class="modal__fieldset">
-            <label class="modal__label" for="upload-category">Categoría</label>
-            <input
-              class="modal__input"
-              id="upload-category"
-              type="text"
-              maxlength="50"
-              required
-            />
-          </fieldset>
+        </div>
 
-          <fieldset class="modal__fieldset">
-            <label class="modal__label">Archivos</label>
-            <div class="drop-zone" id="drop-zone">
-              <p class="drop-zone__text">
-                Arrastra el video y la miniatura aquí
-              </p>
-              <div class="drop-zone__inputs">
-                <div class="drop-zone-col">
-                  <label class="drop-zone__btn btn-base" for="upload-video"
-                    >📽️ Video (.mp4)</label
-                  >
-                  <input
-                    class="drop-zone__file"
-                    id="upload-video"
-                    type="file"
-                    accept="video/mp4,video/webm"
-                  />
-                  <span class="drop-zone__name" id="file-name-video"
-                    >Ningún video</span
-                  >
-                </div>
-                <div class="drop-zone-col">
-                  <label class="drop-zone__btn btn-base" for="upload-thumb"
-                    >🖼️ Miniatura (.jpg)</label
-                  >
-                  <input
-                    class="drop-zone__file"
-                    id="upload-thumb"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                  />
-                  <span class="drop-zone__name" id="file-name-thumb"
-                    >Ninguna miniatura</span
-                  >
-                </div>
+        <ol class="comments__list" id="comments-list"></ol>
+      </section>
+
+      <aside class="sidebar" aria-label="Videos recomendados">
+        <h3 class="sidebar__title">Recomendaciones</h3>
+        <nav class="sidebar__list" id="sidebar-list"></nav>
+      </aside>
+    </article>
+  </section>
+
+  <dialog class="modal glass-modal" id="modal-auth" aria-label="Autenticación">
+    <section class="modal__content">
+      <header class="modal__header">
+        <h2 class="modal__title" id="modal-title">Iniciar Sesión</h2>
+        <button class="modal__close" id="modal-close" aria-label="Cerrar">
+          ✕
+        </button>
+      </header>
+      <form class="modal__form" id="auth-form">
+        <fieldset class="modal__fieldset" id="field-username">
+          <label class="modal__label" for="auth-username">Usuario</label>
+          <input class="modal__input" id="auth-username" type="text" maxlength="50" required autocomplete="username" />
+        </fieldset>
+        <fieldset class="modal__fieldset view--hidden" id="field-email">
+          <label class="modal__label" for="auth-email">Email</label>
+          <input class="modal__input" id="auth-email" type="email" maxlength="100" autocomplete="email" />
+        </fieldset>
+        <fieldset class="modal__fieldset">
+          <label class="modal__label" for="auth-password">Contraseña</label>
+          <input class="modal__input" id="auth-password" type="password" minlength="6" required
+            autocomplete="current-password" />
+        </fieldset>
+        <p class="modal__error view--hidden" id="auth-error"></p>
+        <button class="modal__submit" type="submit" id="auth-submit">
+          Entrar
+        </button>
+      </form>
+      <footer class="modal__footer">
+        <p class="modal__switch" id="modal-switch"></p>
+      </footer>
+    </section>
+  </dialog>
+
+  <dialog class="modal glass-modal" id="modal-upload" aria-label="Subir video">
+    <section class="modal__content modal__content--wide">
+      <header class="modal__header">
+        <h2 class="modal__title">Subir Video</h2>
+        <button class="modal__close" id="upload-close" aria-label="Cerrar">
+          ✕
+        </button>
+      </header>
+      <form class="modal__form" id="upload-form" enctype="multipart/form-data" novalidate>
+        <fieldset class="modal__fieldset">
+          <label class="modal__label" for="upload-title">Título</label>
+          <input class="modal__input" id="upload-title" type="text" maxlength="200" required />
+        </fieldset>
+        <fieldset class="modal__fieldset">
+          <label class="modal__label" for="upload-desc">Descripción</label>
+          <textarea class="modal__input modal__textarea" id="upload-desc" maxlength="2000"></textarea>
+        </fieldset>
+        <fieldset class="modal__fieldset">
+          <label class="modal__label" for="upload-category">Categoría</label>
+          <input class="modal__input" id="upload-category" type="text" maxlength="50" required />
+        </fieldset>
+
+        <fieldset class="modal__fieldset">
+          <label class="modal__label">Archivos</label>
+          <div class="drop-zone" id="drop-zone">
+            <p class="drop-zone__text">
+              Arrastra el video y la miniatura aquí
+            </p>
+            <div class="drop-zone__inputs">
+              <div class="drop-zone-col">
+                <label class="drop-zone__btn btn-base" for="upload-video">📽️ Video (.mp4)</label>
+                <input class="drop-zone__file" id="upload-video" type="file" accept="video/mp4,video/webm" />
+                <span class="drop-zone__name" id="file-name-video">Ningún video</span>
+              </div>
+              <div class="drop-zone-col">
+                <label class="drop-zone__btn btn-base" for="upload-thumb">🖼️ Miniatura (.jpg)</label>
+                <input class="drop-zone__file" id="upload-thumb" type="file" accept="image/jpeg,image/png,image/webp" />
+                <span class="drop-zone__name" id="file-name-thumb">Ninguna miniatura</span>
               </div>
             </div>
-          </fieldset>
+          </div>
+        </fieldset>
 
-          <section class="upload-progress view--hidden" id="upload-progress">
-            <span class="upload-progress__bar" id="upload-bar"></span>
-            <span class="upload-progress__text" id="upload-text">0%</span>
-          </section>
-          <p class="modal__error view--hidden" id="upload-error"></p>
-          <button class="modal__submit" type="submit" id="upload-submit">
-            Subir
-          </button>
-        </form>
-      </section>
-    </dialog>
+        <section class="upload-progress view--hidden" id="upload-progress">
+          <span class="upload-progress__bar" id="upload-bar"></span>
+          <span class="upload-progress__text" id="upload-text">0%</span>
+        </section>
+        <p class="modal__error view--hidden" id="upload-error"></p>
+        <button class="modal__submit" type="submit" id="upload-submit">
+          Subir
+        </button>
+      </form>
+    </section>
+  </dialog>
 
-    <dialog
-      class="modal glass-modal"
-      id="modal-confirm"
-      aria-label="Confirmar acción"
-    >
-      <section class="modal__content">
-        <header class="modal__header">
-          <h2 class="modal__title">¿Estás seguro?</h2>
-        </header>
-        <p class="modal__text">
-          Esta acción no se puede deshacer. El video se eliminará
-          permanentemente.
-        </p>
-        <footer class="modal__actions">
-          <button class="modal__auth-btn" id="confirm-cancel">Cancelar</button>
-          <button class="modal__submit modal__submit--danger" id="confirm-ok">
-            Sí, eliminar
-          </button>
-        </footer>
-      </section>
-    </dialog>
-
-    <footer class="footer">
-      <p>
-        <a
-          href="https://github.com/mat1520"
-          target="_blank"
-          rel="noopener noreferrer"
-          >github.com/mat1520</a
-        >
+  <dialog class="modal glass-modal" id="modal-confirm" aria-label="Confirmar acción">
+    <section class="modal__content">
+      <header class="modal__header">
+        <h2 class="modal__title">¿Estás seguro?</h2>
+      </header>
+      <p class="modal__text">
+        Esta acción no se puede deshacer. El video se eliminará
+        permanentemente.
       </p>
-    </footer>
+      <footer class="modal__actions">
+        <button class="modal__auth-btn" id="confirm-cancel">Cancelar</button>
+        <button class="modal__submit modal__submit--danger" id="confirm-ok">
+          Sí, eliminar
+        </button>
+      </footer>
+    </section>
+  </dialog>
 
-    <output class="toast" id="toast" role="alert" aria-live="polite"></output>
+  <footer class="footer">
+    <p>
+      <a href="https://github.com/mat1520" target="_blank" rel="noopener noreferrer">github.com/mat1520</a>
+    </p>
+  </footer>
 
-    <template id="tmpl-video-card">
-      <article class="video-card" data-video-id="">
-        <figure class="video-card__thumbnail-wrap">
-          <img class="video-card__thumbnail" src="" alt="" loading="lazy" />
-          <time class="video-card__duration"></time>
-        </figure>
-        <header class="video-card__body">
-          <h3 class="video-card__title"></h3>
-          <p class="video-card__meta">
-            <span class="video-card__category"></span>
-          </p>
-        </header>
-      </article>
-    </template>
+  <output class="toast" id="toast" role="alert" aria-live="polite"></output>
 
-    <template id="tmpl-skeleton">
-      <figure class="skeleton" aria-hidden="true">
-        <span class="skeleton__thumbnail"></span>
-        <figcaption class="skeleton__body">
-          <span class="skeleton__line"></span>
-          <span class="skeleton__line skeleton__line--short"></span>
-          <span class="skeleton__line skeleton__line--xs"></span>
-        </figcaption>
+  <template id="tmpl-video-card">
+    <article class="video-card" data-video-id="">
+      <figure class="video-card__thumbnail-wrap">
+        <img class="video-card__thumbnail" src="" alt="" loading="lazy" />
+        <time class="video-card__duration"></time>
       </figure>
-    </template>
+      <header class="video-card__body">
+        <h3 class="video-card__title"></h3>
+        <p class="video-card__meta">
+          <span class="video-card__category"></span>
+        </p>
+      </header>
+    </article>
+  </template>
 
-    <template id="tmpl-comment">
-      <li class="comment">
-        <header class="comment__header">
-          <mark class="comment__avatar"></mark>
-          <cite class="comment__author"></cite>
-          <time class="comment__date"></time>
-        </header>
-        <p class="comment__content"></p>
-      </li>
-    </template>
+  <template id="tmpl-skeleton">
+    <figure class="skeleton" aria-hidden="true">
+      <span class="skeleton__thumbnail"></span>
+      <figcaption class="skeleton__body">
+        <span class="skeleton__line"></span>
+        <span class="skeleton__line skeleton__line--short"></span>
+        <span class="skeleton__line skeleton__line--xs"></span>
+      </figcaption>
+    </figure>
+  </template>
 
-    <template id="tmpl-sidebar-card">
-      <article class="sidebar-card" data-video-id="">
-        <figure class="sidebar-card__thumbnail-wrap">
-          <img class="sidebar-card__thumbnail" src="" alt="" loading="lazy" />
-          <time class="sidebar-card__duration"></time>
-        </figure>
-        <header class="sidebar-card__info">
-          <h4 class="sidebar-card__title"></h4>
-          <span class="sidebar-card__meta"></span>
-        </header>
-      </article>
-    </template>
+  <template id="tmpl-comment">
+    <li class="comment">
+      <header class="comment__header">
+        <mark class="comment__avatar"></mark>
+        <cite class="comment__author"></cite>
+        <time class="comment__date"></time>
+      </header>
+      <p class="comment__content"></p>
+    </li>
+  </template>
 
-    <script src="app.js"></script>
-  </body>
+  <template id="tmpl-sidebar-card">
+    <article class="sidebar-card" data-video-id="">
+      <figure class="sidebar-card__thumbnail-wrap">
+        <img class="sidebar-card__thumbnail" src="" alt="" loading="lazy" />
+        <time class="sidebar-card__duration"></time>
+      </figure>
+      <header class="sidebar-card__info">
+        <h4 class="sidebar-card__title"></h4>
+        <span class="sidebar-card__meta"></span>
+      </header>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+
 </html>
