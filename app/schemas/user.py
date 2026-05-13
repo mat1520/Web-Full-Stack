@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator
 
 from app.core.security import sanitize_text
+from app.schemas.base import BaseSchema
 
 
 class UserRegister(BaseModel):
@@ -31,9 +32,7 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
+class UserRead(BaseSchema):
     id: int
     username: str
     email: str

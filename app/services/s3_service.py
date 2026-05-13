@@ -74,6 +74,10 @@ class S3Service:
             logger.error("Failed to delete s3://%s/%s: %s", self._bucket, key, exc)
             raise
 
+    def extract_key_from_url(self, url: str) -> str:
+        from urllib.parse import unquote
+        return unquote(url.split(".amazonaws.com/")[-1])
+
 
 def get_s3_service() -> S3Service:
     return S3Service(get_settings())

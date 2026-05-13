@@ -352,32 +352,39 @@
     return f;
   };
 
-  const renderVideoCard = (v) => {
-    const f = clone("tmpl-video-card");
-    f.querySelector(".video-card").dataset.videoId = v.id;
-    const img = f.querySelector(".video-card__thumbnail");
+  const CARD_CONFIG = {
+    "tmpl-video-card": {
+      root: ".video-card",
+      thumb: ".video-card__thumbnail",
+      duration: ".video-card__duration",
+      title: ".video-card__title",
+      meta: ".video-card__category",
+    },
+    "tmpl-sidebar-card": {
+      root: ".sidebar-card",
+      thumb: ".sidebar-card__thumbnail",
+      duration: ".sidebar-card__duration",
+      title: ".sidebar-card__title",
+      meta: ".sidebar-card__meta",
+    },
+  };
+
+  const renderBaseCard = (v, templateId) => {
+    const cfg = CARD_CONFIG[templateId];
+    const f = clone(templateId);
+    f.querySelector(cfg.root).dataset.videoId = v.id;
+    const img = f.querySelector(cfg.thumb);
     img.src = v.thumbnail_url;
     img.alt = v.title;
-    f.querySelector(".video-card__duration").textContent = v.duration;
-    f.querySelector(".video-card__title").textContent = v.title;
-    f.querySelector(".video-card__category").textContent = v.category;
-    f.querySelector(".video-card").onclick = () => navigateTo(`/video/${v.id}`);
+    f.querySelector(cfg.duration).textContent = v.duration;
+    f.querySelector(cfg.title).textContent = v.title;
+    f.querySelector(cfg.meta).textContent = v.category;
+    f.querySelector(cfg.root).onclick = () => navigateTo(`/video/${v.id}`);
     return f;
   };
 
-  const renderSidebarCard = (v) => {
-    const f = clone("tmpl-sidebar-card");
-    f.querySelector(".sidebar-card").dataset.videoId = v.id;
-    const img = f.querySelector(".sidebar-card__thumbnail");
-    img.src = v.thumbnail_url;
-    img.alt = v.title;
-    f.querySelector(".sidebar-card__duration").textContent = v.duration;
-    f.querySelector(".sidebar-card__title").textContent = v.title;
-    f.querySelector(".sidebar-card__meta").textContent = v.category;
-    f.querySelector(".sidebar-card").onclick = () =>
-      navigateTo(`/video/${v.id}`);
-    return f;
-  };
+  const renderVideoCard = (v) => renderBaseCard(v, "tmpl-video-card");
+  const renderSidebarCard = (v) => renderBaseCard(v, "tmpl-sidebar-card");
 
   const renderCategoryFilter = (videos) => {
     const cats = new Set(videos.map((v) => v.category));
@@ -422,11 +429,16 @@
     dom.videoGrid.appendChild(frag);
   };
 
+  const VIEWS = [dom.homeView, dom.detailView, dom.uploadView];
+
+  const switchView = (activeView, showBack) => {
+    VIEWS.forEach((v) => v.classList.add("view--hidden"));
+    activeView.classList.remove("view--hidden");
+    dom.backBtn.classList.toggle("header__back--visible", showBack);
+  };
+
   const showHomeView = async () => {
-    dom.detailView.classList.add("view--hidden");
-    dom.uploadView.classList.add("view--hidden");
-    dom.homeView.classList.remove("view--hidden");
-    dom.backBtn.classList.remove("header__back--visible");
+    switchView(dom.homeView, false);
     dom.mainVideo.pause();
     dom.mainVideo.removeAttribute("src");
     dom.mainVideo.load();
@@ -458,10 +470,7 @@
   };
 
   const showDetailView = async (id) => {
-    dom.homeView.classList.add("view--hidden");
-    dom.uploadView.classList.add("view--hidden");
-    dom.detailView.classList.remove("view--hidden");
-    dom.backBtn.classList.add("header__back--visible");
+    switchView(dom.detailView, true);
 
     dom.playerTitle.textContent = "Cargando...";
     clear(dom.playerMeta);
@@ -567,10 +576,7 @@
       showToast("Inicia sesión para subir videos", "error");
       return navigateTo("/");
     }
-    dom.homeView.classList.add("view--hidden");
-    dom.detailView.classList.add("view--hidden");
-    dom.uploadView.classList.remove("view--hidden");
-    dom.backBtn.classList.add("header__back--visible");
+    switchView(dom.uploadView, true);
     dom.uploadForm.reset();
     dom.fileNameVideo.textContent = "Ningún video";
     dom.fileNameThumb.textContent = "Ninguna miniatura";

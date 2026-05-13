@@ -1,18 +1,15 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
-
+from app.schemas.base import BaseSchema
 from app.schemas.comment import CommentRead
 
 
-class CategoryRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class CategoryRead(BaseSchema):
     id: int
     name: str
 
-class VideoRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
 
+class VideoRead(BaseSchema):
     id: int
     title: str
     description: str

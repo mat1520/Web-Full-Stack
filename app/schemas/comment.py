@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, field_validator
 
 from app.core.security import sanitize_text
+from app.schemas.base import BaseSchema
 
 
 class CommentCreate(BaseModel):
@@ -18,9 +19,7 @@ class CommentCreate(BaseModel):
         return v
 
 
-class CommentRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
+class CommentRead(BaseSchema):
     id: int
     video_id: int
     author: str

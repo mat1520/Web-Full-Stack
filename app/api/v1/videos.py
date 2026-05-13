@@ -32,13 +32,23 @@ def _validate_file_signature(file: UploadFile, allowed: set[str]) -> None:
     for magic, mime in MAGIC_SIGNATURES.items():
         if header.startswith(magic) and mime in allowed:
             return
-    raise HTTPException(400, f"El archivo no coincide con un formato permitido")
+    raise HTTPException(400, "El archivo no coincide con un formato permitido")
 
 
 def _safe_key(name: str) -> str:
     clean = re.sub(r'[<>:"/\\|?*\']', "", name)
     clean = re.sub(r"\s+", "_", clean).strip("_")
     return clean[:80]
+
+
+def _process_and_upload(
+    file: UploadFile, s3_key: str, content_type: str, s3: S3Service
+) -> str:
+    suffix = Path(s3_key).suffix or ".bin"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(file.file.read())
+        tmp_path = Path(tmp.name)
+    return s3.upload_file(tmp_path, s3_key, content_type=content_type, cleanup=True)
 
 
 def get_video_service_dep(session: Session = Depends(get_session)) -> VideoService:
@@ -90,24 +100,12 @@ def upload_video(
 
     safe_name = _safe_key(title)
     video_ext = video_file.filename.rsplit(".", 1)[-1] if "." in video_file.filename else "mp4"
-    s3_video_key = f"videos/{safe_name}.{video_ext}"
-    s3_thumb_key = f"thumbnails/{safe_name}.jpg"
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{video_ext}") as tmp_v:
-        tmp_v.write(video_file.file.read())
-        tmp_video_path = Path(tmp_v.name)
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_t:
-        tmp_t.write(thumbnail_file.file.read())
-        tmp_thumb_path = Path(tmp_t.name)
-
-    video_url = s3.upload_file(
-        tmp_video_path, s3_video_key,
-        content_type=video_file.content_type, cleanup=True,
+    video_url = _process_and_upload(
+        video_file, f"videos/{safe_name}.{video_ext}", video_file.content_type, s3
     )
-    thumbnail_url = s3.upload_file(
-        tmp_thumb_path, s3_thumb_key,
-        content_type="image/jpeg", cleanup=True,
+    thumbnail_url = _process_and_upload(
+        thumbnail_file, f"thumbnails/{safe_name}.jpg", "image/jpeg", s3
     )
 
     return service.create_video(

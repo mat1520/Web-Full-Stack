@@ -1,5 +1,4 @@
 from typing import Dict, List
-from urllib.parse import unquote
 import logging
 import time
 
@@ -22,10 +21,31 @@ class VideoService:
     def __init__(self, session: Session):
         self.session = session
 
+    def _find_category_by_name(self, name: str) -> Category | None:
+        return self.session.exec(
+            select(Category).where(func.lower(Category.name) == name.lower())
+        ).first()
+
+    def _get_or_create_category(self, name: str) -> Category:
+        cat_obj = self._find_category_by_name(name)
+        if not cat_obj:
+            cat_obj = Category(name=name)
+            self.session.add(cat_obj)
+            self.session.commit()
+            self.session.refresh(cat_obj)
+        return cat_obj
+
+    def _invalidate_category_cache(self) -> None:
+        global _CATEGORY_CACHE
+        _CATEGORY_CACHE["timestamp"] = 0
+
     def get_videos(self, category: str | None = None) -> List[Video]:
         statement = select(Video).join(Category, isouter=True).order_by(col(Video.created_at).desc())
         if category:
-            statement = statement.where(func.lower(Category.name) == category.lower())
+            cat_obj = self._find_category_by_name(category)
+            if not cat_obj:
+                return []
+            statement = statement.where(Video.category_id == cat_obj.id)
         return list(self.session.exec(statement).all())
 
     def get_video_detail(self, video_id: int) -> Video:
@@ -60,19 +80,6 @@ class VideoService:
             picks[cat.name] = list(self.session.exec(statement).all())
         return picks
 
-    def _get_or_create_category(self, name: str) -> Category:
-        cat_obj = self.session.exec(select(Category).where(func.lower(Category.name) == name.lower())).first()
-        if not cat_obj:
-            cat_obj = Category(name=name)
-            self.session.add(cat_obj)
-            self.session.commit()
-            self.session.refresh(cat_obj)
-        return cat_obj
-
-    def _invalidate_category_cache(self) -> None:
-        global _CATEGORY_CACHE
-        _CATEGORY_CACHE["timestamp"] = 0
-
     def create_video(
         self,
         title: str,
@@ -95,16 +102,14 @@ class VideoService:
         self.session.add(video)
         self.session.commit()
         self.session.refresh(video)
-        
+
         self._invalidate_category_cache()
         return video
 
     def _delete_s3_files(self, s3: S3Service, video: Video) -> None:
         try:
-            video_key = unquote(video.video_url.split(".amazonaws.com/")[-1])
-            thumb_key = unquote(video.thumbnail_url.split(".amazonaws.com/")[-1])
-            s3.delete_object(video_key)
-            s3.delete_object(thumb_key)
+            s3.delete_object(s3.extract_key_from_url(video.video_url))
+            s3.delete_object(s3.extract_key_from_url(video.thumbnail_url))
         except Exception as exc:
             logger.warning("Failed to delete S3 files for video %s: %s", video.id, exc)
 
