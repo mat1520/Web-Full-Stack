@@ -4,7 +4,7 @@ install:
 	pip install -r requirements.txt
 
 run:
-	uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+	fastapi dev app/main.py
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
