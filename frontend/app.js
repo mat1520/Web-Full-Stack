@@ -60,6 +60,8 @@
     modalConfirm: $("modal-confirm"),
     confirmCancel: $("confirm-cancel"),
     confirmOk: $("confirm-ok"),
+    hamburgerBtn: $("hamburger-btn"),
+    headerMenu: $("header-menu"),
   };
 
   const state = {
@@ -594,6 +596,20 @@
   };
 
   document.addEventListener("DOMContentLoaded", () => {
+    const closeMenu = () => {
+      dom.hamburgerBtn.classList.remove("header__hamburger--open");
+      dom.headerMenu.classList.remove("header__menu--open");
+      dom.hamburgerBtn.setAttribute("aria-expanded", "false");
+    };
+    dom.hamburgerBtn.onclick = () => {
+      const open = dom.headerMenu.classList.toggle("header__menu--open");
+      dom.hamburgerBtn.classList.toggle("header__hamburger--open", open);
+      dom.hamburgerBtn.setAttribute("aria-expanded", String(open));
+    };
+    window.addEventListener("hashchange", closeMenu);
+    dom.headerMenu.addEventListener("click", (e) => {
+      if (e.target.closest(".header__auth-btn")) closeMenu();
+    });
     updateAuthUI();
     initDragAndDrop();
     window.addEventListener("hashchange", resolveRoute);
