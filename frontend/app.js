@@ -42,8 +42,7 @@
     authSubmit: $("auth-submit"),
     fieldEmail: $("field-email"),
     modalSwitch: $("modal-switch"),
-    modalUpload: $("modal-upload"),
-    uploadClose: $("upload-close"),
+    uploadView: $("upload-view"),
     uploadForm: $("upload-form"),
     uploadTitle: $("upload-title"),
     uploadDesc: $("upload-desc"),
@@ -258,7 +257,6 @@
         dom.uploadBar.style.width = `${pct}%`;
         dom.uploadText.textContent = `${pct}%`;
       });
-      dom.modalUpload.close();
       state.videos = [];
       state.recommendations = {};
       showToast("Video subido correctamente", "success");
@@ -425,6 +423,7 @@
 
   const showHomeView = async () => {
     dom.detailView.classList.add("view--hidden");
+    dom.uploadView.classList.add("view--hidden");
     dom.homeView.classList.remove("view--hidden");
     dom.backBtn.classList.remove("header__back--visible");
     dom.mainVideo.pause();
@@ -451,6 +450,7 @@
 
   const showDetailView = async (id) => {
     dom.homeView.classList.add("view--hidden");
+    dom.uploadView.classList.add("view--hidden");
     dom.detailView.classList.remove("view--hidden");
     dom.backBtn.classList.add("header__back--visible");
 
@@ -542,10 +542,28 @@
   };
 
   const navigateTo = (path) => (window.location.hash = path);
+  const showUploadView = () => {
+    if (!state.token) {
+      showToast("Inicia sesión para subir videos", "error");
+      return navigateTo("/");
+    }
+    dom.homeView.classList.add("view--hidden");
+    dom.detailView.classList.add("view--hidden");
+    dom.uploadView.classList.remove("view--hidden");
+    dom.backBtn.classList.add("header__back--visible");
+    dom.uploadForm.reset();
+    dom.fileNameVideo.textContent = "Ningún video";
+    dom.fileNameThumb.textContent = "Ninguna miniatura";
+    dom.uploadProgress.classList.add("view--hidden");
+    dom.uploadError.classList.add("view--hidden");
+  };
+
   const resolveRoute = () => {
     const hash = window.location.hash.slice(1);
     if (hash.startsWith("/video/"))
       return showDetailView(parseInt(hash.split("/")[2], 10));
+    if (hash === "/upload")
+      return showUploadView();
     showHomeView();
   };
 
@@ -568,16 +586,10 @@
     };
     dom.modalClose.onclick = () => dom.modalAuth.close();
     dom.authForm.onsubmit = handleAuthSubmit;
-    dom.btnUploadOpen.onclick = () =>
-      state.token
-        ? (dom.uploadForm.reset(),
-          dom.fileNameVideo.textContent = "Ningun video",
-          dom.fileNameThumb.textContent = "Ninguna miniatura",
-          dom.uploadProgress.classList.add("view--hidden"),
-          dom.uploadError.classList.add("view--hidden"),
-          dom.modalUpload.showModal())
-        : showToast("Inicia sesión para subir", "error");
-    dom.uploadClose.onclick = () => dom.modalUpload.close();
+    dom.btnUploadOpen.onclick = () => {
+      if (!state.token) return showToast("Inicia sesión para subir videos", "error");
+      navigateTo("/upload");
+    };
     dom.uploadForm.onsubmit = handleUploadSubmit;
     dom.uploadVideo.onchange = (e) =>
       (dom.fileNameVideo.textContent =

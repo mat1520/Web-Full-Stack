@@ -131,13 +131,10 @@
     </section>
   </dialog>
 
-  <dialog class="modal glass-modal" id="modal-upload" aria-label="Subir video">
-    <section class="modal__content modal__content--wide">
-      <header class="modal__header">
-        <h2 class="modal__title">Subir Video</h2>
-        <button class="modal__close" id="upload-close" aria-label="Cerrar">
-          ✕
-        </button>
+  <section id="upload-view" class="view--hidden upload-page">
+    <div class="upload-container">
+      <header class="upload-header">
+        <h2 class="upload-title">Subir Video</h2>
       </header>
       <form class="modal__form" id="upload-form" enctype="multipart/form-data" novalidate>
         <fieldset class="modal__fieldset">
@@ -183,8 +180,8 @@
           Subir
         </button>
       </form>
-    </section>
-  </dialog>
+    </div>
+  </section>
 
   <dialog class="modal glass-modal" id="modal-confirm" aria-label="Confirmar acción">
     <section class="modal__content">
