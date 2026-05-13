@@ -793,6 +793,21 @@ section:not(.view--hidden) {
   font-size: 0.875rem;
   margin-top: 4rem;
 }
+.footer__github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color var(--duration);
+}
+.footer__github:hover {
+  color: #fff;
+}
+.footer__icon {
+  width: 20px;
+  height: 20px;
+}
 .toast {
   position: fixed;
   bottom: 2rem;
