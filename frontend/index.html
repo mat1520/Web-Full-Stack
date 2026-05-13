@@ -21,21 +21,28 @@
         ← Galería
       </button>
       <span class="header__spacer"></span>
-      <section class="header__auth" id="auth-section">
-        <button class="header__auth-btn" id="btn-login">
-          Iniciar Sesión
-        </button>
-        <button class="header__auth-btn header__auth-btn--accent" id="btn-register">
-          Registro
-        </button>
-      </section>
-      <section class="header__user view--hidden" id="user-section">
-        <span class="header__username" id="header-username"></span>
-        <button class="header__auth-btn header__auth-btn--accent" id="btn-upload-open">
-          Subir Video
-        </button>
-        <button class="header__auth-btn" id="btn-logout">Salir</button>
-      </section>
+      <button class="header__hamburger" id="hamburger-btn" aria-label="Menú" aria-expanded="false">
+        <span class="header__hamburger-line"></span>
+        <span class="header__hamburger-line"></span>
+        <span class="header__hamburger-line"></span>
+      </button>
+      <div class="header__menu" id="header-menu">
+        <section class="header__auth" id="auth-section">
+          <button class="header__auth-btn" id="btn-login">
+            Iniciar Sesión
+          </button>
+          <button class="header__auth-btn header__auth-btn--accent" id="btn-register">
+            Registro
+          </button>
+        </section>
+        <section class="header__user view--hidden" id="user-section">
+          <span class="header__username" id="header-username"></span>
+          <button class="header__auth-btn header__auth-btn--accent" id="btn-upload-open">
+            Subir Video
+          </button>
+          <button class="header__auth-btn" id="btn-logout">Salir</button>
+        </section>
+      </div>
     </nav>
   </header>
 
