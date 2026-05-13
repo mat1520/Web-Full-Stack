@@ -329,7 +329,10 @@
     clear(container);
     const section = document.createElement("section");
     section.className = "state-msg";
-    section.innerHTML = `<p class="state-msg__text">${msg}</p>`;
+    const p = document.createElement("p");
+    p.className = "state-msg__text";
+    p.textContent = msg;
+    section.appendChild(p);
     if (retryFn) {
       const btn = document.createElement("button");
       btn.className = "state-msg__retry";
@@ -474,7 +477,14 @@
       dom.playerTitle.textContent = v.title;
       dom.playerDesc.textContent = v.description;
 
-      dom.playerMeta.innerHTML = `<span class="player__category-badge">${v.category}</span><time>${v.duration}</time>`;
+      dom.playerMeta.textContent = "";
+      const badge = document.createElement("span");
+      badge.className = "player__category-badge";
+      badge.textContent = v.category;
+      const timeEl = document.createElement("time");
+      timeEl.textContent = v.duration;
+      dom.playerMeta.appendChild(badge);
+      dom.playerMeta.appendChild(timeEl);
 
       dom.commentsCount.textContent = `(${v.comments.length})`;
       if (!v.comments.length)
@@ -504,7 +514,11 @@
       picks.forEach((v) => frag.appendChild(renderSidebarCard(v)));
       dom.sidebarList.appendChild(frag);
     } catch {
-      dom.sidebarList.innerHTML = `<p class="state-msg__text">No se pudieron cargar las recomendaciones</p>`;
+      clear(dom.sidebarList);
+      const errP = document.createElement("p");
+      errP.className = "state-msg__text";
+      errP.textContent = "No se pudieron cargar las recomendaciones";
+      dom.sidebarList.appendChild(errP);
     }
   };
 

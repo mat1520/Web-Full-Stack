@@ -330,16 +330,16 @@ section:not(.view--hidden) {
 }
 .detail {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr;
   gap: 2rem;
   max-width: var(--max-w);
   margin: 0 auto;
   padding: 2rem 1.5rem;
   align-items: start;
 }
-@media (max-width: 1024px) {
+@media (min-width: 1024px) {
   .detail {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 340px;
   }
 }
 .player__figure {
