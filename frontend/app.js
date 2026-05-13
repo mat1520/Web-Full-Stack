@@ -1,758 +1,419 @@
 "use strict";
 
-(function () {
-  var API = "/api/v1";
+(() => {
+  const API = "/api/v1";
 
-var dom = {
-  homeView:       document.getElementById("home-view"),
-  detailView:     document.getElementById("detail-view"),
-  videoGrid:      document.getElementById("video-grid"),
-  categoryList:   document.getElementById("category-list"),
-  backBtn:        document.getElementById("back-btn"),
-  brandLink:      document.getElementById("brand-link"),
-  mainVideo:      document.getElementById("main-video"),
-  playerTitle:    document.getElementById("player-title"),
-  playerMeta:     document.getElementById("player-meta"),
-  playerDesc:     document.getElementById("player-description"),
-  btnDeleteVideo: document.getElementById("btn-delete-video"),
-  commentForm:    document.getElementById("comment-form"),
-  commentContent: document.getElementById("comment-content"),
-  commentsList:   document.getElementById("comments-list"),
-  commentsCount:  document.getElementById("comments-count"),
-  commentAuthPrompt: document.getElementById("comment-auth-prompt"),
-  btnPromptLogin: document.getElementById("btn-prompt-login"),
-  sidebarList:    document.getElementById("sidebar-list"),
-  toast:          document.getElementById("toast"),
-  authSection:    document.getElementById("auth-section"),
-  userSection:    document.getElementById("user-section"),
-  headerUsername: document.getElementById("header-username"),
-  btnLogin:       document.getElementById("btn-login"),
-  btnRegister:    document.getElementById("btn-register"),
-  btnLogout:      document.getElementById("btn-logout"),
-  btnUploadOpen:  document.getElementById("btn-upload-open"),
-  modalAuth:      document.getElementById("modal-auth"),
-  modalTitle:     document.getElementById("modal-title"),
-  modalClose:     document.getElementById("modal-close"),
-  authForm:       document.getElementById("auth-form"),
-  authUsername:   document.getElementById("auth-username"),
-  authEmail:      document.getElementById("auth-email"),
-  authPassword:   document.getElementById("auth-password"),
-  authError:      document.getElementById("auth-error"),
-  authSubmit:     document.getElementById("auth-submit"),
-  fieldEmail:     document.getElementById("field-email"),
-  modalSwitch:    document.getElementById("modal-switch"),
-  modalUpload:    document.getElementById("modal-upload"),
-  uploadClose:    document.getElementById("upload-close"),
-  uploadForm:     document.getElementById("upload-form"),
-  uploadTitle:    document.getElementById("upload-title"),
-  uploadDesc:     document.getElementById("upload-desc"),
-  uploadCategory: document.getElementById("upload-category"),
-  uploadVideo:    document.getElementById("upload-video"),
-  uploadThumb:    document.getElementById("upload-thumb"),
-  fileNameVideo:  document.getElementById("file-name-video"),
-  fileNameThumb:  document.getElementById("file-name-thumb"),
-  dropZone:       document.getElementById("drop-zone"),
-  uploadProgress: document.getElementById("upload-progress"),
-  uploadBar:      document.getElementById("upload-bar"),
-  uploadText:     document.getElementById("upload-text"),
-  uploadError:    document.getElementById("upload-error"),
-  uploadSubmit:   document.getElementById("upload-submit"),
-  modalConfirm:   document.getElementById("modal-confirm"),
-  confirmCancel:  document.getElementById("confirm-cancel"),
-  confirmOk:      document.getElementById("confirm-ok")
-};
+  const $ = id => document.getElementById(id);
+  const dom = {
+    homeView: $("home-view"), detailView: $("detail-view"), videoGrid: $("video-grid"),
+    categoryList: $("category-list"), backBtn: $("back-btn"), brandLink: $("brand-link"),
+    mainVideo: $("main-video"), playerTitle: $("player-title"), playerMeta: $("player-meta"),
+    playerDesc: $("player-description"), btnDeleteVideo: $("btn-delete-video"),
+    commentForm: $("comment-form"), commentContent: $("comment-content"), commentsList: $("comments-list"),
+    commentsCount: $("comments-count"), commentAuthPrompt: $("comment-auth-prompt"),
+    btnPromptLogin: $("btn-prompt-login"), sidebarList: $("sidebar-list"), toast: $("toast"),
+    authSection: $("auth-section"), userSection: $("user-section"), headerUsername: $("header-username"),
+    btnLogin: $("btn-login"), btnRegister: $("btn-register"), btnLogout: $("btn-logout"),
+    btnUploadOpen: $("btn-upload-open"), modalAuth: $("modal-auth"), modalTitle: $("modal-title"),
+    modalClose: $("modal-close"), authForm: $("auth-form"), authUsername: $("auth-username"),
+    authEmail: $("auth-email"), authPassword: $("auth-password"), authError: $("auth-error"),
+    authSubmit: $("auth-submit"), fieldEmail: $("field-email"), modalSwitch: $("modal-switch"),
+    modalUpload: $("modal-upload"), uploadClose: $("upload-close"), uploadForm: $("upload-form"),
+    uploadTitle: $("upload-title"), uploadDesc: $("upload-desc"), uploadCategory: $("upload-category"),
+    uploadVideo: $("upload-video"), uploadThumb: $("upload-thumb"), fileNameVideo: $("file-name-video"),
+    fileNameThumb: $("file-name-thumb"), dropZone: $("drop-zone"), uploadProgress: $("upload-progress"),
+    uploadBar: $("upload-bar"), uploadText: $("upload-text"), uploadError: $("upload-error"),
+    uploadSubmit: $("upload-submit"), modalConfirm: $("modal-confirm"), confirmCancel: $("confirm-cancel"),
+    confirmOk: $("confirm-ok")
+  };
 
-var state = {
-  videos: [],
-  currentVideo: null,
-  activeCategory: null,
-  recommendations: {},
-  token: localStorage.getItem("sc_token") || null,
-  user: JSON.parse(localStorage.getItem("sc_user") || "null"),
-  authMode: "login"
-};
+  const state = {
+    videos: [], currentVideo: null, activeCategory: null, recommendations: {},
+    token: localStorage.getItem("sc_token") || null,
+    user: JSON.parse(localStorage.getItem("sc_user") || "null"),
+    authMode: "login"
+  };
 
-function clearChildren(el) {
-  while (el.firstChild) el.removeChild(el.firstChild);
-}
+  const clear = el => { while (el.firstChild) el.removeChild(el.firstChild); };
+  const clone = id => $(id).content.cloneNode(true);
+  const timeAgo = d => {
+    const mins = Math.floor((Date.now() - new Date(d)) / 60000);
+    if (mins < 1) return "ahora";
+    if (mins < 60) return `${mins} min`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d`;
+    return `${Math.floor(days / 30)} mes(es)`;
+  };
 
-function cloneTemplate(id) {
-  return document.getElementById(id).content.cloneNode(true);
-}
+  let toastTimer;
+  const showToast = (msg, type) => {
+    dom.toast.textContent = msg;
+    dom.toast.className = `toast toast--visible ${type === "success" ? "toast--success" : ""}`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => dom.toast.className = "toast", 3500);
+  };
 
-function timeAgo(dateStr) {
-  var diff = Date.now() - new Date(dateStr).getTime();
-  var mins = Math.floor(diff / 60000);
-  if (mins < 1) return "ahora";
-  if (mins < 60) return mins + " min";
-  var hrs = Math.floor(mins / 60);
-  if (hrs < 24) return hrs + "h";
-  var days = Math.floor(hrs / 24);
-  if (days < 30) return days + "d";
-  var months = Math.floor(days / 30);
-  return months + " mes" + (months > 1 ? "es" : "");
-}
+  const request = async (endpoint, options = {}) => {
+    const headers = options.headers || {};
+    if (state.token && !options.noAuth) headers["Authorization"] = `Bearer ${state.token}`;
+    if (options.body && !(options.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(options.body);
+    }
+    const res = await fetch(`${API}${endpoint}`, { ...options, headers });
+    if (!res.ok) {
+      let err = "Error de conexión";
+      try { err = (await res.json()).detail || `Error ${res.status}`; } catch(e){}
+      throw new Error(err);
+    }
+    return res.status === 204 ? true : res.json();
+  };
 
-function showToast(msg, type) {
-  dom.toast.textContent = msg;
-  dom.toast.className = "toast toast--visible" + (type === "success" ? " toast--success" : "");
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(function () { dom.toast.className = "toast"; }, 3500);
-}
-
-var api = {
-  getVideos: function (category) {
-    var url = API + "/videos";
-    if (category) url += "?category=" + encodeURIComponent(category);
-    return fetch(url).then(function (r) {
-      if (!r.ok) throw new Error("Error " + r.status);
-      return r.json();
-    });
-  },
-
-  getVideo: function (id) {
-    return fetch(API + "/videos/" + id).then(function (r) {
-      if (!r.ok) throw new Error("Error " + r.status);
-      return r.json();
-    });
-  },
-
-  getRandomPicks: function () {
-    return fetch(API + "/videos/random-picks").then(function (r) {
-      if (!r.ok) throw new Error("Error " + r.status);
-      return r.json();
-    });
-  },
-
-  deleteVideo: function (id) {
-    return fetch(API + "/videos/" + id, {
-      method: "DELETE",
-      headers: { "Authorization": "Bearer " + state.token }
-    }).then(function (r) {
-      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (e) {
-        throw new Error(e.detail || "Error " + r.status);
-      });
-      return true;
-    });
-  },
-
-  postComment: function (data) {
-    return fetch(API + "/comments", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + state.token 
-      },
-      body: JSON.stringify(data)
-    }).then(function (r) {
-      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (e) {
-        throw new Error(e.detail || "Error " + r.status);
-      });
-      return r.json();
-    });
-  },
-
-  authRequest: function (endpoint, data) {
-    return fetch(API + "/auth/" + endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }).then(function (r) {
-      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (e) {
-        throw new Error(e.detail || "Error " + r.status);
-      });
-      return r.json();
-    });
-  },
-
-  uploadVideo: function (formData, onProgress) {
-    return new Promise(function (resolve, reject) {
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", API + "/videos/upload");
-      xhr.setRequestHeader("Authorization", "Bearer " + state.token);
-      xhr.upload.addEventListener("progress", function (e) {
-        if (e.lengthComputable && onProgress) {
-          onProgress(Math.round((e.loaded / e.total) * 100));
-        }
-      });
-      xhr.addEventListener("load", function () {
-        if (xhr.status === 201) {
-          resolve(JSON.parse(xhr.responseText));
-        } else {
-          var err = {};
-          try { err = JSON.parse(xhr.responseText); } catch (_) {}
-          reject(new Error(err.detail || "Error " + xhr.status));
-        }
-      });
-      xhr.addEventListener("error", function () { reject(new Error("Error de red")); });
+  const api = {
+    getVideos: cat => request(`/videos${cat ? `?category=${encodeURIComponent(cat)}` : ""}`),
+    getVideo: id => request(`/videos/${id}`),
+    getRandomPicks: () => request("/videos/random-picks"),
+    deleteVideo: id => request(`/videos/${id}`, { method: "DELETE" }),
+    postComment: data => request("/comments", { method: "POST", body: data }),
+    authRequest: (ep, data) => request(`/auth/${ep}`, { method: "POST", body: data, noAuth: true }),
+    uploadVideo: (formData, onProgress) => new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API}/videos/upload`);
+      xhr.setRequestHeader("Authorization", `Bearer ${state.token}`);
+      xhr.upload.onprogress = e => e.lengthComputable && onProgress?.(Math.round((e.loaded / e.total) * 100));
+      xhr.onload = () => xhr.status === 201 ? resolve(JSON.parse(xhr.responseText)) : reject(new Error(JSON.parse(xhr.responseText)?.detail || "Upload error"));
+      xhr.onerror = () => reject(new Error("Error de red"));
       xhr.send(formData);
-    });
-  }
-};
+    })
+  };
 
-function saveSession(data) {
-  state.token = data.access_token;
-  state.user = data.user;
-  localStorage.setItem("sc_token", data.access_token);
-  localStorage.setItem("sc_user", JSON.stringify(data.user));
-  updateAuthUI();
-}
+  const saveSession = data => {
+    state.token = data.access_token;
+    state.user = data.user;
+    localStorage.setItem("sc_token", data.access_token);
+    localStorage.setItem("sc_user", JSON.stringify(data.user));
+    updateAuthUI();
+  };
+  const clearSession = () => {
+    state.token = state.user = null;
+    localStorage.removeItem("sc_token");
+    localStorage.removeItem("sc_user");
+    updateAuthUI();
+  };
 
-function clearSession() {
-  state.token = null;
-  state.user = null;
-  localStorage.removeItem("sc_token");
-  localStorage.removeItem("sc_user");
-  updateAuthUI();
-}
+  const updateOwnershipUI = () => {
+    dom.btnDeleteVideo.classList.toggle("view--hidden", !(state.currentVideo && state.user && state.currentVideo.owner_id === state.user.id));
+  };
 
-function updateAuthUI() {
-  if (state.user) {
-    dom.authSection.classList.add("view--hidden");
-    dom.userSection.classList.remove("view--hidden");
-    dom.headerUsername.textContent = state.user.username;
-    dom.commentAuthPrompt.classList.add("view--hidden");
-    dom.commentForm.classList.remove("view--hidden");
-  } else {
-    dom.authSection.classList.remove("view--hidden");
-    dom.userSection.classList.add("view--hidden");
-    dom.commentAuthPrompt.classList.remove("view--hidden");
-    dom.commentForm.classList.add("view--hidden");
-  }
-  updateOwnershipUI();
-}
+  const updateAuthUI = () => {
+    const isAuth = !!state.user;
+    dom.authSection.classList.toggle("view--hidden", isAuth);
+    dom.userSection.classList.toggle("view--hidden", !isAuth);
+    dom.commentAuthPrompt.classList.toggle("view--hidden", isAuth);
+    dom.commentForm.classList.toggle("view--hidden", !isAuth);
+    if (isAuth) dom.headerUsername.textContent = state.user.username;
+    updateOwnershipUI();
+  };
 
-function updateOwnershipUI() {
-  if (state.currentVideo && state.user && state.currentVideo.owner_id === state.user.id) {
-    dom.btnDeleteVideo.classList.remove("view--hidden");
-  } else {
-    dom.btnDeleteVideo.classList.add("view--hidden");
-  }
-}
-
-function openAuthModal(mode) {
-  state.authMode = mode;
-  dom.authForm.reset();
-  dom.authError.classList.add("view--hidden");
-
-  if (mode === "register") {
-    dom.modalTitle.textContent = "Crear Cuenta";
-    dom.fieldEmail.classList.remove("view--hidden");
-    dom.authSubmit.textContent = "Registrarse";
-    clearChildren(dom.modalSwitch);
-    dom.modalSwitch.appendChild(document.createTextNode("¿Ya tienes cuenta? "));
-    var link = document.createElement("button");
+  const openAuthModal = mode => {
+    state.authMode = mode;
+    dom.authForm.reset();
+    dom.authError.classList.add("view--hidden");
+    const isReg = mode === "register";
+    dom.modalTitle.textContent = isReg ? "Crear Cuenta" : "Iniciar Sesión";
+    dom.fieldEmail.classList.toggle("view--hidden", !isReg);
+    dom.authSubmit.textContent = isReg ? "Registrarse" : "Entrar";
+    clear(dom.modalSwitch);
+    dom.modalSwitch.appendChild(document.createTextNode(isReg ? "¿Ya tienes cuenta? " : "¿No tienes cuenta? "));
+    const link = document.createElement("button");
     link.className = "modal__switch-link";
     link.type = "button";
-    link.textContent = "Inicia Sesión";
-    link.addEventListener("click", function () { openAuthModal("login"); });
+    link.textContent = isReg ? "Inicia Sesión" : "Regístrate";
+    link.onclick = () => openAuthModal(isReg ? "login" : "register");
     dom.modalSwitch.appendChild(link);
-  } else {
-    dom.modalTitle.textContent = "Iniciar Sesión";
-    dom.fieldEmail.classList.add("view--hidden");
-    dom.authSubmit.textContent = "Entrar";
-    clearChildren(dom.modalSwitch);
-    dom.modalSwitch.appendChild(document.createTextNode("¿No tienes cuenta? "));
-    var link2 = document.createElement("button");
-    link2.className = "modal__switch-link";
-    link2.type = "button";
-    link2.textContent = "Regístrate";
-    link2.addEventListener("click", function () { openAuthModal("register"); });
-    dom.modalSwitch.appendChild(link2);
-  }
-
-  dom.modalAuth.showModal();
-}
-
-function handleAuthSubmit(e) {
-  e.preventDefault();
-  dom.authError.classList.add("view--hidden");
-  dom.authSubmit.disabled = true;
-
-  var data = {
-    username: dom.authUsername.value.trim(),
-    password: dom.authPassword.value
+    dom.modalAuth.showModal();
   };
 
-  if (state.authMode === "register") {
-    data.email = dom.authEmail.value.trim();
-  }
-
-  api.authRequest(state.authMode === "register" ? "register" : "login", data)
-    .then(function (res) {
+  const handleAuthSubmit = async e => {
+    e.preventDefault();
+    dom.authError.classList.add("view--hidden");
+    dom.authSubmit.disabled = true;
+    const data = { username: dom.authUsername.value.trim(), password: dom.authPassword.value };
+    if (state.authMode === "register") data.email = dom.authEmail.value.trim();
+    
+    try {
+      const res = await api.authRequest(state.authMode, data);
       saveSession(res);
       dom.modalAuth.close();
-      showToast("Bienvenido, " + res.user.username, "success");
-    })
-    .catch(function (err) {
+      showToast(`Bienvenido, ${res.user.username}`, "success");
+    } catch (err) {
       dom.authError.textContent = err.message;
       dom.authError.classList.remove("view--hidden");
-    })
-    .finally(function () {
-      dom.authSubmit.disabled = false;
-    });
-}
-
-function openUploadModal() {
-  if (!state.token) {
-    showToast("Inicia sesión para subir videos", "error");
-    return;
-  }
-  dom.uploadForm.reset();
-  dom.uploadProgress.classList.add("view--hidden");
-  dom.uploadError.classList.add("view--hidden");
-  dom.uploadBar.style.width = "0%";
-  dom.uploadText.textContent = "0%";
-  dom.fileNameVideo.textContent = "No seleccionado";
-  dom.fileNameThumb.textContent = "No seleccionado";
-  dom.modalUpload.showModal();
-}
-
-function handleUploadSubmit(e) {
-  e.preventDefault();
-  dom.uploadError.classList.add("view--hidden");
-  dom.uploadSubmit.disabled = true;
-  dom.uploadProgress.classList.remove("view--hidden");
-
-  var formData = new FormData();
-  formData.append("title", dom.uploadTitle.value.trim());
-  formData.append("description", dom.uploadDesc.value.trim());
-  formData.append("category", dom.uploadCategory.value.trim());
-  formData.append("video_file", dom.uploadVideo.files[0]);
-  formData.append("thumbnail_file", dom.uploadThumb.files[0]);
-
-  api.uploadVideo(formData, function (pct) {
-    dom.uploadBar.style.width = pct + "%";
-    dom.uploadText.textContent = pct + "%";
-  })
-    .then(function (video) {
-      dom.modalUpload.close();
-      state.videos = [];
-      state.recommendations = {};
-      showToast("Video subido correctamente", "success");
-      navigateTo("/video/" + video.id);
-    })
-    .catch(function (err) {
-      dom.uploadError.textContent = err.message;
-      dom.uploadError.classList.remove("view--hidden");
-    })
-    .finally(function () {
-      dom.uploadSubmit.disabled = false;
-    });
-}
-
-function confirmDelete() {
-  if (!state.currentVideo) return;
-  dom.modalConfirm.showModal();
-}
-
-function executeDelete() {
-  var id = state.currentVideo.id;
-  dom.confirmOk.disabled = true;
-  api.deleteVideo(id).then(function() {
-    dom.modalConfirm.close();
-    showToast("Video eliminado", "success");
-    state.videos = [];
-    state.recommendations = {};
-    navigateTo("/");
-  }).catch(function(err) {
-    showToast(err.message, "error");
-  }).finally(function() {
-    dom.confirmOk.disabled = false;
-  });
-}
-
-function renderVideoCard(video) {
-  var frag = cloneTemplate("tmpl-video-card");
-  var card = frag.querySelector(".video-card");
-  card.dataset.videoId = video.id;
-  var img = frag.querySelector(".video-card__thumbnail");
-  img.src = video.thumbnail_url;
-  img.alt = video.title;
-  frag.querySelector(".video-card__duration").textContent = video.duration;
-  frag.querySelector(".video-card__title").textContent = video.title;
-  frag.querySelector(".video-card__category").textContent = video.category;
-  card.addEventListener("click", function () { navigateTo("/video/" + video.id); });
-  return frag;
-}
-
-function renderSkeletons(container, count) {
-  clearChildren(container);
-  for (var i = 0; i < count; i++) container.appendChild(cloneTemplate("tmpl-skeleton"));
-}
-
-function renderComment(comment, isOptimistic) {
-  var frag = cloneTemplate("tmpl-comment");
-  var el = frag.querySelector(".comment");
-  if (isOptimistic) el.classList.add("comment--optimistic");
-  var authorName = comment.author || "Desconocido";
-  frag.querySelector(".comment__avatar").textContent = authorName.charAt(0).toUpperCase();
-  frag.querySelector(".comment__author").textContent = authorName;
-  frag.querySelector(".comment__date").textContent = timeAgo(comment.created_at || new Date().toISOString());
-  frag.querySelector(".comment__content").textContent = comment.content;
-  return frag;
-}
-
-function renderSidebarCard(video) {
-  var frag = cloneTemplate("tmpl-sidebar-card");
-  var card = frag.querySelector(".sidebar-card");
-  card.dataset.videoId = video.id;
-  var img = frag.querySelector(".sidebar-card__thumbnail");
-  img.src = video.thumbnail_url;
-  img.alt = video.title;
-  frag.querySelector(".sidebar-card__duration").textContent = video.duration;
-  frag.querySelector(".sidebar-card__title").textContent = video.title;
-  frag.querySelector(".sidebar-card__meta").textContent = video.category;
-  card.addEventListener("click", function () { navigateTo("/video/" + video.id); });
-  return frag;
-}
-
-function renderEmptyState(container, message) {
-  clearChildren(container);
-  var section = document.createElement("section");
-  section.className = "state-msg";
-  var icon = document.createElement("span");
-  icon.className = "state-msg__icon";
-  icon.textContent = "";
-  section.appendChild(icon);
-  var text = document.createElement("p");
-  text.className = "state-msg__text";
-  text.textContent = message;
-  section.appendChild(text);
-  container.appendChild(section);
-}
-
-function renderErrorState(container, message, retryFn) {
-  clearChildren(container);
-  var section = document.createElement("section");
-  section.className = "state-msg";
-  var icon = document.createElement("span");
-  icon.className = "state-msg__icon";
-  icon.textContent = "";
-  section.appendChild(icon);
-  var text = document.createElement("p");
-  text.className = "state-msg__text";
-  text.textContent = message;
-  section.appendChild(text);
-  if (retryFn) {
-    var btn = document.createElement("button");
-    btn.className = "state-msg__retry";
-    btn.textContent = "Reintentar";
-    btn.addEventListener("click", retryFn);
-    section.appendChild(btn);
-  }
-  container.appendChild(section);
-}
-
-function renderCategoryFilter(videos) {
-  var cats = new Set();
-  videos.forEach(function (v) { cats.add(v.category); });
-  clearChildren(dom.categoryList);
-  dom.categoryList.appendChild(createCategoryBtn("Todos", null));
-  cats.forEach(function (cat) { dom.categoryList.appendChild(createCategoryBtn(cat, cat)); });
-  updateActiveCategory(null);
-}
-
-function createCategoryBtn(label, category) {
-  var li = document.createElement("li");
-  li.setAttribute("role", "tab");
-  var btn = document.createElement("button");
-  btn.className = "category-filter__btn";
-  btn.textContent = label;
-  btn.dataset.category = category || "";
-  btn.addEventListener("click", function () { filterByCategory(category); });
-  li.appendChild(btn);
-  return li;
-}
-
-function updateActiveCategory(category) {
-  state.activeCategory = category;
-  dom.categoryList.querySelectorAll(".category-filter__btn").forEach(function (btn) {
-    var match = (btn.dataset.category || null) === (category || null);
-    if (!category && btn.dataset.category === "") match = true;
-    btn.classList.toggle("category-filter__btn--active", match);
-    btn.setAttribute("aria-selected", match ? "true" : "false");
-  });
-}
-
-function filterByCategory(category) {
-  updateActiveCategory(category);
-  var filtered = category
-    ? state.videos.filter(function (v) { return v.category === category; })
-    : state.videos;
-  renderVideoGrid(filtered);
-}
-
-function renderVideoGrid(videos) {
-  clearChildren(dom.videoGrid);
-  if (videos.length === 0) {
-    renderEmptyState(dom.videoGrid, "No hay videos en esta categoría");
-    return;
-  }
-  var frag = document.createDocumentFragment();
-  videos.forEach(function (v) { frag.appendChild(renderVideoCard(v)); });
-  dom.videoGrid.appendChild(frag);
-}
-
-function showHomeView() {
-  dom.detailView.classList.add("view--hidden");
-  dom.homeView.classList.remove("view--hidden");
-  dom.backBtn.classList.remove("header__back--visible");
-  dom.mainVideo.pause();
-  dom.mainVideo.removeAttribute("src");
-  dom.mainVideo.load();
-  state.currentVideo = null;
-  updateOwnershipUI();
-
-  if (state.videos.length > 0) {
-    filterByCategory(state.activeCategory);
-    return;
-  }
-
-  renderSkeletons(dom.videoGrid, 8);
-
-  api.getVideos().then(function (videos) {
-    state.videos = videos;
-    renderCategoryFilter(state.videos);
-    renderVideoGrid(state.videos);
-  }).catch(function () {
-    renderErrorState(dom.videoGrid, "Error al cargar los videos", showHomeView);
-    showToast("Error de conexión con el servidor", "error");
-  });
-}
-
-function startAutoplay() {
-  dom.mainVideo.muted = true;
-  var attempt = dom.mainVideo.play();
-  if (attempt !== undefined) {
-    attempt.then(function () {
-      dom.mainVideo.muted = false;
-    }).catch(function () {});
-  }
-}
-
-function showDetailView(videoId) {
-  dom.homeView.classList.add("view--hidden");
-  dom.detailView.classList.remove("view--hidden");
-  dom.backBtn.classList.add("header__back--visible");
-
-  dom.playerTitle.textContent = "Cargando...";
-  clearChildren(dom.playerMeta);
-  dom.playerDesc.textContent = "";
-  clearChildren(dom.commentsList);
-  dom.commentsCount.textContent = "";
-
-  api.getVideo(videoId).then(function (video) {
-    state.currentVideo = video;
-    updateOwnershipUI();
-    dom.mainVideo.src = video.video_url;
-    dom.mainVideo.poster = video.thumbnail_url;
-    dom.mainVideo.load();
-    dom.mainVideo.addEventListener("canplay", startAutoplay, { once: true });
-    dom.playerTitle.textContent = video.title;
-    dom.playerDesc.textContent = video.description;
-    renderPlayerMeta(video);
-    renderCommentsList(video.comments);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }).catch(function () {
-    dom.playerTitle.textContent = "Video no encontrado";
-    showToast("No se pudo cargar el video", "error");
-  });
-
-  loadRecommendations();
-}
-
-function renderPlayerMeta(video) {
-  clearChildren(dom.playerMeta);
-  var badge = document.createElement("span");
-  badge.className = "player__category-badge";
-  badge.textContent = video.category;
-  dom.playerMeta.appendChild(badge);
-  var dur = document.createElement("time");
-  dur.textContent = video.duration;
-  dom.playerMeta.appendChild(dur);
-}
-
-function renderCommentsList(comments) {
-  clearChildren(dom.commentsList);
-  dom.commentsCount.textContent = "(" + comments.length + ")";
-  if (comments.length === 0) {
-    renderEmptyState(dom.commentsList, "Sé el primero en comentar");
-    return;
-  }
-  var sorted = comments.slice().sort(function (a, b) {
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
-  var frag = document.createDocumentFragment();
-  sorted.forEach(function (c) { frag.appendChild(renderComment(c, false)); });
-  dom.commentsList.appendChild(frag);
-}
-
-function loadRecommendations() {
-  clearChildren(dom.sidebarList);
-  var promise = Object.keys(state.recommendations).length === 0
-    ? api.getRandomPicks()
-    : Promise.resolve(state.recommendations);
-
-  promise.then(function (data) {
-    state.recommendations = data;
-    var all = [];
-    Object.keys(data).forEach(function (cat) {
-      data[cat].forEach(function (v) {
-        if (!state.currentVideo || v.id !== state.currentVideo.id) all.push(v);
-      });
-    });
-    var picks = all.sort(function () { return 0.5 - Math.random(); }).slice(0, 12);
-    var frag = document.createDocumentFragment();
-    picks.forEach(function (v) { frag.appendChild(renderSidebarCard(v)); });
-    dom.sidebarList.appendChild(frag);
-  }).catch(function () {
-    var p = document.createElement("p");
-    p.className = "state-msg__text";
-    p.textContent = "No se pudieron cargar las recomendaciones";
-    dom.sidebarList.appendChild(p);
-  });
-}
-
-function handleCommentSubmit(e) {
-  e.preventDefault();
-  if (!state.user) {
-    showToast("Inicia sesión primero", "error");
-    return;
-  }
-  
-  var content = dom.commentContent.value.trim();
-
-  if (!content) {
-    showToast("Escribe un comentario", "error");
-    dom.commentContent.focus();
-    return;
-  }
-
-  var submitBtn = dom.commentForm.querySelector(".comment-form__submit");
-  submitBtn.disabled = true;
-
-  var optimistic = {
-    id: Date.now(),
-    video_id: state.currentVideo.id,
-    author: state.user.username,
-    content: content,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    } finally { dom.authSubmit.disabled = false; }
   };
 
-  var emptyMsg = dom.commentsList.querySelector(".state-msg");
-  if (emptyMsg) clearChildren(dom.commentsList);
+  const handleUploadSubmit = async e => {
+    e.preventDefault();
+    dom.uploadError.classList.add("view--hidden");
+    dom.uploadSubmit.disabled = true;
+    dom.uploadProgress.classList.remove("view--hidden");
 
-  dom.commentsList.insertBefore(renderComment(optimistic, true), dom.commentsList.firstChild);
-  dom.commentsCount.textContent = "(" + (state.currentVideo.comments.length + 1) + ")";
-  dom.commentContent.value = "";
+    const fd = new FormData();
+    fd.append("title", dom.uploadTitle.value.trim());
+    fd.append("description", dom.uploadDesc.value.trim());
+    fd.append("category", dom.uploadCategory.value.trim());
+    fd.append("video_file", dom.uploadVideo.files[0]);
+    fd.append("thumbnail_file", dom.uploadThumb.files[0]);
 
-  api.postComment({
-    video_id: state.currentVideo.id,
-    content: content
-  }).then(function (saved) {
-    state.currentVideo.comments.push(saved);
-    var node = dom.commentsList.querySelector(".comment--optimistic");
-    if (node) node.classList.remove("comment--optimistic");
-    showToast("Comentario publicado", "success");
-  }).catch(function (err) {
-    var node = dom.commentsList.querySelector(".comment--optimistic");
-    if (node) node.remove();
-    dom.commentsCount.textContent = "(" + state.currentVideo.comments.length + ")";
-    dom.commentContent.value = content;
-    showToast(err.message || "Error al enviar el comentario", "error");
-  }).finally(function () {
-    submitBtn.disabled = false;
-  });
-}
+    try {
+      const video = await api.uploadVideo(fd, pct => {
+        dom.uploadBar.style.width = `${pct}%`;
+        dom.uploadText.textContent = `${pct}%`;
+      });
+      dom.modalUpload.close();
+      state.videos = []; state.recommendations = {};
+      showToast("Video subido correctamente", "success");
+      navigateTo(`/video/${video.id}`);
+    } catch (err) {
+      dom.uploadError.textContent = err.message;
+      dom.uploadError.classList.remove("view--hidden");
+    } finally { dom.uploadSubmit.disabled = false; }
+  };
 
-function handleFileSelect(e) {
-  var target = e.target;
-  var nameEl = target.id === 'upload-video' ? dom.fileNameVideo : dom.fileNameThumb;
-  if (target.files.length > 0) {
-    nameEl.textContent = target.files[0].name;
-  } else {
-    nameEl.textContent = "No seleccionado";
-  }
-}
+  const executeDelete = async () => {
+    dom.confirmOk.disabled = true;
+    try {
+      await api.deleteVideo(state.currentVideo.id);
+      dom.modalConfirm.close();
+      showToast("Video eliminado", "success");
+      state.videos = []; state.recommendations = {};
+      navigateTo("/");
+    } catch (err) { showToast(err.message, "error"); }
+    finally { dom.confirmOk.disabled = false; }
+  };
 
-function initDragAndDrop() {
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
-    dom.dropZone.addEventListener(eventName, preventDefaults, false);
-  });
-  function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-  ['dragenter', 'dragover'].forEach(function(eventName) {
-    dom.dropZone.addEventListener(eventName, function() { dom.dropZone.classList.add('dragover'); }, false);
-  });
-  ['dragleave', 'drop'].forEach(function(eventName) {
-    dom.dropZone.addEventListener(eventName, function() { dom.dropZone.classList.remove('dragover'); }, false);
-  });
-  dom.dropZone.addEventListener('drop', function(e) {
-    var dt = e.dataTransfer;
-    var files = dt.files;
-    for (var i = 0; i < files.length; i++) {
-      if (files[i].type.startsWith("video/")) {
-        dom.uploadVideo.files = createFileList(files[i]);
-        dom.fileNameVideo.textContent = files[i].name;
-      } else if (files[i].type.startsWith("image/")) {
-        dom.uploadThumb.files = createFileList(files[i]);
-        dom.fileNameThumb.textContent = files[i].name;
-      }
+  const handleCommentSubmit = async e => {
+    e.preventDefault();
+    if (!state.user) return showToast("Inicia sesión primero", "error");
+    const content = dom.commentContent.value.trim();
+    if (!content) return dom.commentContent.focus();
+
+    dom.commentForm.querySelector(".comment-form__submit").disabled = true;
+    const optimistic = { id: Date.now(), video_id: state.currentVideo.id, author: state.user.username, content, created_at: new Date().toISOString() };
+    
+    if (dom.commentsList.querySelector(".state-msg")) clear(dom.commentsList);
+    dom.commentsList.prepend(renderComment(optimistic, true));
+    dom.commentsCount.textContent = `(${state.currentVideo.comments.length + 1})`;
+    dom.commentContent.value = "";
+
+    try {
+      const saved = await api.postComment({ video_id: state.currentVideo.id, content });
+      state.currentVideo.comments.push(saved);
+      dom.commentsList.querySelector(".comment--optimistic")?.classList.remove("comment--optimistic");
+      showToast("Comentario publicado", "success");
+    } catch (err) {
+      dom.commentsList.querySelector(".comment--optimistic")?.remove();
+      dom.commentsCount.textContent = `(${state.currentVideo.comments.length})`;
+      dom.commentContent.value = content;
+      showToast(err.message || "Error al enviar", "error");
+    } finally { dom.commentForm.querySelector(".comment-form__submit").disabled = false; }
+  };
+
+  const renderState = (container, msg, retryFn) => {
+    clear(container);
+    const section = document.createElement("section");
+    section.className = "state-msg";
+    section.innerHTML = `<span class="state-msg__icon"></span><p class="state-msg__text">${msg}</p>`;
+    if (retryFn) {
+      const btn = document.createElement("button");
+      btn.className = "state-msg__retry";
+      btn.textContent = "Reintentar";
+      btn.onclick = retryFn;
+      section.appendChild(btn);
     }
-  }, false);
-}
+    container.appendChild(section);
+  };
 
-function createFileList(file) {
-  var dt = new DataTransfer();
-  dt.items.add(file);
-  return dt.files;
-}
+  const renderComment = (comment, isOpt) => {
+    const f = clone("tmpl-comment");
+    if (isOpt) f.querySelector(".comment").classList.add("comment--optimistic");
+    const author = comment.author || "Desconocido";
+    f.querySelector(".comment__avatar").textContent = author[0].toUpperCase();
+    f.querySelector(".comment__author").textContent = author;
+    f.querySelector(".comment__date").textContent = timeAgo(comment.created_at);
+    f.querySelector(".comment__content").textContent = comment.content;
+    return f;
+  };
 
-function navigateTo(path) {
-  window.location.hash = path;
-}
+  const renderVideoCard = v => {
+    const f = clone("tmpl-video-card");
+    f.querySelector(".video-card").dataset.videoId = v.id;
+    const img = f.querySelector(".video-card__thumbnail");
+    img.src = v.thumbnail_url; img.alt = v.title;
+    f.querySelector(".video-card__duration").textContent = v.duration;
+    f.querySelector(".video-card__title").textContent = v.title;
+    f.querySelector(".video-card__category").textContent = v.category;
+    f.querySelector(".video-card").onclick = () => navigateTo(`/video/${v.id}`);
+    return f;
+  };
 
-function resolveRoute() {
-  var hash = window.location.hash.slice(1);
-  if (hash.indexOf("/video/") === 0) {
-    var id = hash.split("/")[2];
-    if (id) { showDetailView(parseInt(id, 10)); return; }
-  }
-  showHomeView();
-}
+  const renderSidebarCard = v => {
+    const f = clone("tmpl-sidebar-card");
+    f.querySelector(".sidebar-card").dataset.videoId = v.id;
+    const img = f.querySelector(".sidebar-card__thumbnail");
+    img.src = v.thumbnail_url; img.alt = v.title;
+    f.querySelector(".sidebar-card__duration").textContent = v.duration;
+    f.querySelector(".sidebar-card__title").textContent = v.title;
+    f.querySelector(".sidebar-card__meta").textContent = v.category;
+    f.querySelector(".sidebar-card").onclick = () => navigateTo(`/video/${v.id}`);
+    return f;
+  };
 
-function init() {
-  updateAuthUI();
-  initDragAndDrop();
-  window.addEventListener("hashchange", resolveRoute);
-  dom.backBtn.addEventListener("click", function () { navigateTo("/"); });
-  dom.brandLink.addEventListener("click", function (e) { e.preventDefault(); navigateTo("/"); });
-  dom.commentForm.addEventListener("submit", handleCommentSubmit);
-  dom.btnPromptLogin.addEventListener("click", function () { openAuthModal("login"); });
+  const renderCategoryFilter = videos => {
+    const cats = new Set(videos.map(v => v.category));
+    clear(dom.categoryList);
+    const createBtn = (label, val) => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.className = "category-filter__btn";
+      btn.textContent = label;
+      btn.dataset.category = val || "";
+      btn.onclick = () => filterByCategory(val);
+      li.appendChild(btn);
+      return li;
+    };
+    dom.categoryList.appendChild(createBtn("Todos", null));
+    cats.forEach(c => dom.categoryList.appendChild(createBtn(c, c)));
+    updateActiveCategory(null);
+  };
 
-  dom.btnLogin.addEventListener("click", function () { openAuthModal("login"); });
-  dom.btnRegister.addEventListener("click", function () { openAuthModal("register"); });
-  dom.btnLogout.addEventListener("click", function () {
-    clearSession();
-    showToast("Sesión cerrada", "success");
+  const updateActiveCategory = cat => {
+    state.activeCategory = cat;
+    dom.categoryList.querySelectorAll(".category-filter__btn").forEach(btn => {
+      const match = (btn.dataset.category || null) === (cat || null) || (!cat && btn.dataset.category === "");
+      btn.classList.toggle("category-filter__btn--active", match);
+    });
+  };
+
+  const filterByCategory = cat => {
+    updateActiveCategory(cat);
+    const filtered = cat ? state.videos.filter(v => v.category === cat) : state.videos;
+    clear(dom.videoGrid);
+    if (!filtered.length) return renderState(dom.videoGrid, "No hay videos en esta categoría");
+    const frag = document.createDocumentFragment();
+    filtered.forEach(v => frag.appendChild(renderVideoCard(v)));
+    dom.videoGrid.appendChild(frag);
+  };
+
+  const showHomeView = async () => {
+    dom.detailView.classList.add("view--hidden");
+    dom.homeView.classList.remove("view--hidden");
+    dom.backBtn.classList.remove("header__back--visible");
+    dom.mainVideo.pause(); dom.mainVideo.removeAttribute("src"); dom.mainVideo.load();
+    state.currentVideo = null; updateOwnershipUI();
+
+    if (state.videos.length > 0) return filterByCategory(state.activeCategory);
+
+    clear(dom.videoGrid);
+    for(let i=0; i<8; i++) dom.videoGrid.appendChild(clone("tmpl-skeleton"));
+
+    try {
+      state.videos = await api.getVideos();
+      renderCategoryFilter(state.videos);
+      filterByCategory(state.activeCategory);
+    } catch {
+      renderState(dom.videoGrid, "Error al cargar los videos", showHomeView);
+      showToast("Error de conexión", "error");
+    }
+  };
+
+  const showDetailView = async id => {
+    dom.homeView.classList.add("view--hidden");
+    dom.detailView.classList.remove("view--hidden");
+    dom.backBtn.classList.add("header__back--visible");
+
+    dom.playerTitle.textContent = "Cargando...";
+    clear(dom.playerMeta); dom.playerDesc.textContent = "";
+    clear(dom.commentsList); dom.commentsCount.textContent = "";
+
+    try {
+      const v = await api.getVideo(id);
+      state.currentVideo = v; updateOwnershipUI();
+      dom.mainVideo.src = v.video_url; dom.mainVideo.poster = v.thumbnail_url;
+      dom.mainVideo.muted = true;
+      dom.mainVideo.play().then(() => dom.mainVideo.muted = false).catch(()=>{});
+      dom.playerTitle.textContent = v.title; dom.playerDesc.textContent = v.description;
+      
+      dom.playerMeta.innerHTML = `<span class="player__category-badge">${v.category}</span><time>${v.duration}</time>`;
+      
+      dom.commentsCount.textContent = `(${v.comments.length})`;
+      if (!v.comments.length) renderState(dom.commentsList, "Sé el primero en comentar");
+      else {
+        const frag = document.createDocumentFragment();
+        v.comments.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).forEach(c => frag.appendChild(renderComment(c)));
+        dom.commentsList.appendChild(frag);
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      dom.playerTitle.textContent = "Video no encontrado";
+      showToast("No se pudo cargar el video", "error");
+    }
+
+    try {
+      if (!Object.keys(state.recommendations).length) state.recommendations = await api.getRandomPicks();
+      const all = Object.values(state.recommendations).flat().filter(v => v.id !== id);
+      const picks = all.sort(() => 0.5 - Math.random()).slice(0, 12);
+      clear(dom.sidebarList);
+      const frag = document.createDocumentFragment();
+      picks.forEach(v => frag.appendChild(renderSidebarCard(v)));
+      dom.sidebarList.appendChild(frag);
+    } catch {
+      dom.sidebarList.innerHTML = `<p class="state-msg__text">No se pudieron cargar las recomendaciones</p>`;
+    }
+  };
+
+  const initDragAndDrop = () => {
+    const pd = e => { e.preventDefault(); e.stopPropagation(); };
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => dom.dropZone.addEventListener(e, pd));
+    ['dragenter', 'dragover'].forEach(e => dom.dropZone.addEventListener(e, () => dom.dropZone.classList.add('dragover')));
+    ['dragleave', 'drop'].forEach(e => dom.dropZone.addEventListener(e, () => dom.dropZone.classList.remove('dragover')));
+    dom.dropZone.addEventListener('drop', e => {
+      Array.from(e.dataTransfer.files).forEach(f => {
+        const dt = new DataTransfer(); dt.items.add(f);
+        if (f.type.startsWith("video/")) { dom.uploadVideo.files = dt.files; dom.fileNameVideo.textContent = f.name; }
+        else if (f.type.startsWith("image/")) { dom.uploadThumb.files = dt.files; dom.fileNameThumb.textContent = f.name; }
+      });
+    });
+  };
+
+  const navigateTo = path => window.location.hash = path;
+  const resolveRoute = () => {
+    const hash = window.location.hash.slice(1);
+    if (hash.startsWith("/video/")) return showDetailView(parseInt(hash.split("/")[2], 10));
+    showHomeView();
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateAuthUI(); initDragAndDrop();
+    window.addEventListener("hashchange", resolveRoute);
+    dom.backBtn.onclick = () => navigateTo("/");
+    dom.brandLink.onclick = e => { e.preventDefault(); navigateTo("/"); };
+    dom.commentForm.onsubmit = handleCommentSubmit;
+    dom.btnPromptLogin.onclick = dom.btnLogin.onclick = () => openAuthModal("login");
+    dom.btnRegister.onclick = () => openAuthModal("register");
+    dom.btnLogout.onclick = () => { clearSession(); showToast("Sesión cerrada", "success"); };
+    dom.modalClose.onclick = () => dom.modalAuth.close();
+    dom.authForm.onsubmit = handleAuthSubmit;
+    dom.btnUploadOpen.onclick = () => state.token ? (dom.uploadForm.reset(), dom.uploadProgress.classList.add("view--hidden"), dom.uploadError.classList.add("view--hidden"), dom.modalUpload.showModal()) : showToast("Inicia sesión para subir", "error");
+    dom.uploadClose.onclick = () => dom.modalUpload.close();
+    dom.uploadForm.onsubmit = handleUploadSubmit;
+    dom.uploadVideo.onchange = e => dom.fileNameVideo.textContent = e.target.files[0]?.name || "No seleccionado";
+    dom.uploadThumb.onchange = e => dom.fileNameThumb.textContent = e.target.files[0]?.name || "No seleccionado";
+    dom.btnDeleteVideo.onclick = () => state.currentVideo && dom.modalConfirm.showModal();
+    dom.confirmCancel.onclick = () => dom.modalConfirm.close();
+    dom.confirmOk.onclick = executeDelete;
+    resolveRoute();
   });
-  dom.modalClose.addEventListener("click", function () { dom.modalAuth.close(); });
-  dom.authForm.addEventListener("submit", handleAuthSubmit);
-
-  dom.btnUploadOpen.addEventListener("click", openUploadModal);
-  dom.uploadClose.addEventListener("click", function () { dom.modalUpload.close(); });
-  dom.uploadForm.addEventListener("submit", handleUploadSubmit);
-  dom.uploadVideo.addEventListener("change", handleFileSelect);
-  dom.uploadThumb.addEventListener("change", handleFileSelect);
-
-  dom.btnDeleteVideo.addEventListener("click", confirmDelete);
-  dom.confirmCancel.addEventListener("click", function () { dom.modalConfirm.close(); });
-  dom.confirmOk.addEventListener("click", executeDelete);
-
-  resolveRoute();
-}
-
-document.addEventListener("DOMContentLoaded", init);
-
 })();
