@@ -14,12 +14,8 @@
 <body>
   <header class="header">
     <nav class="header__inner" aria-label="Navegación principal">
-      <a class="header__brand" id="brand-link" href="#/" aria-label="Ir al inicio">
-        StreamCore
-      </a>
-      <button class="header__back" id="back-btn" aria-label="Volver a la galería">
-        ← Galería
-      </button>
+      <a class="header__brand" id="brand-link" href="#/" aria-label="Ir al inicio">StreamCore</a>
+      <button class="header__back" id="back-btn" aria-label="Volver a la galería">← Galería</button>
       <span class="header__spacer"></span>
       <button class="header__hamburger" id="hamburger-btn" aria-label="Menú" aria-expanded="false">
         <span class="header__hamburger-line"></span>
@@ -28,19 +24,13 @@
       </button>
       <div class="header__menu" id="header-menu">
         <section class="header__auth" id="auth-section">
-          <button class="header__auth-btn" id="btn-login">
-            Iniciar Sesión
-          </button>
-          <button class="header__auth-btn header__auth-btn--accent" id="btn-register">
-            Registro
-          </button>
+          <button class="btn" id="btn-login">Iniciar Sesión</button>
+          <button class="btn btn--accent" id="btn-register">Registro</button>
         </section>
         <section class="header__user view--hidden" id="user-section">
           <span class="header__username" id="header-username"></span>
-          <button class="header__auth-btn header__auth-btn--accent" id="btn-upload-open">
-            Subir Video
-          </button>
-          <button class="header__auth-btn" id="btn-logout">Salir</button>
+          <button class="btn btn--accent" id="btn-upload-open">Subir Video</button>
+          <button class="btn" id="btn-logout">Salir</button>
         </section>
       </div>
     </nav>
@@ -75,26 +65,19 @@
 
       <section class="comments" aria-label="Comentarios">
         <h2 class="comments__header">
-          Comentarios
-          <span class="comments__count" id="comments-count"></span>
+          Comentarios <span class="comments__count" id="comments-count"></span>
         </h2>
-
         <form class="comment-form view--hidden" id="comment-form">
           <textarea class="comment-form__textarea" id="comment-content" placeholder="Escribe un comentario..."
             maxlength="1000" required aria-label="Contenido del comentario"></textarea>
           <footer class="comment-form__actions">
-            <button class="comment-form__submit" type="submit">
-              Comentar
-            </button>
+            <button class="btn btn--accent" type="submit">Comentar</button>
           </footer>
         </form>
         <div class="comment-auth-prompt" id="comment-auth-prompt">
           <p>Inicia sesión para poder comentar.</p>
-          <button class="header__auth-btn header__auth-btn--accent" id="btn-prompt-login">
-            Iniciar Sesión
-          </button>
+          <button class="btn btn--accent" id="btn-prompt-login">Iniciar Sesión</button>
         </div>
-
         <ol class="comments__list" id="comments-list"></ol>
       </section>
 
@@ -109,12 +92,10 @@
     <section class="modal__content">
       <header class="modal__header">
         <h2 class="modal__title" id="modal-title">Iniciar Sesión</h2>
-        <button class="modal__close" id="modal-close" aria-label="Cerrar">
-          ✕
-        </button>
+        <button class="modal__close" id="modal-close" aria-label="Cerrar">✕</button>
       </header>
       <form class="modal__form" id="auth-form">
-        <fieldset class="modal__fieldset" id="field-username">
+        <fieldset class="modal__fieldset">
           <label class="modal__label" for="auth-username">Usuario</label>
           <input class="modal__input" id="auth-username" type="text" maxlength="50" required autocomplete="username" />
         </fieldset>
@@ -128,12 +109,10 @@
             autocomplete="current-password" />
         </fieldset>
         <p class="modal__error view--hidden" id="auth-error"></p>
-        <button class="modal__submit" type="submit" id="auth-submit">
-          Entrar
-        </button>
+        <button class="btn btn--accent modal__submit" type="submit" id="auth-submit">Entrar</button>
       </form>
       <footer class="modal__footer">
-        <p class="modal__switch" id="modal-switch"></p>
+        <p id="modal-switch"></p>
       </footer>
     </section>
   </dialog>
@@ -156,36 +135,31 @@
           <label class="modal__label" for="upload-category">Categoría</label>
           <input class="modal__input" id="upload-category" type="text" maxlength="50" required />
         </fieldset>
-
         <fieldset class="modal__fieldset">
           <label class="modal__label">Archivos</label>
           <div class="drop-zone" id="drop-zone">
-            <p class="drop-zone__text">
-              Arrastra el video y la miniatura aquí
-            </p>
+            <p class="drop-zone__text">Arrastra el video y la miniatura aquí</p>
             <div class="drop-zone__inputs">
               <div class="drop-zone-col">
-                <label class="drop-zone__btn btn-base" for="upload-video">Video (.mp4)</label>
+                <label class="drop-zone__btn btn" for="upload-video">Video (.mp4)</label>
                 <input class="drop-zone__file" id="upload-video" type="file" accept="video/mp4,video/webm" />
                 <span class="drop-zone__name" id="file-name-video">Ningún video</span>
               </div>
               <div class="drop-zone-col">
-                <label class="drop-zone__btn btn-base" for="upload-thumb">Miniatura (.jpg)</label>
-                <input class="drop-zone__file" id="upload-thumb" type="file" accept="image/jpeg,image/png,image/webp" />
+                <label class="drop-zone__btn btn" for="upload-thumb">Miniatura (.jpg)</label>
+                <input class="drop-zone__file" id="upload-thumb" type="file"
+                  accept="image/jpeg,image/png,image/webp" />
                 <span class="drop-zone__name" id="file-name-thumb">Ninguna miniatura</span>
               </div>
             </div>
           </div>
         </fieldset>
-
         <section class="upload-progress view--hidden" id="upload-progress">
           <span class="upload-progress__bar" id="upload-bar"></span>
           <span class="upload-progress__text" id="upload-text">0%</span>
         </section>
         <p class="modal__error view--hidden" id="upload-error"></p>
-        <button class="modal__submit" type="submit" id="upload-submit">
-          Subir
-        </button>
+        <button class="btn btn--accent modal__submit" type="submit" id="upload-submit">Subir</button>
       </form>
     </div>
   </section>
@@ -195,15 +169,10 @@
       <header class="modal__header">
         <h2 class="modal__title">¿Estás seguro?</h2>
       </header>
-      <p class="modal__text">
-        Esta acción no se puede deshacer. El video se eliminará
-        permanentemente.
-      </p>
+      <p class="modal__text">Esta acción no se puede deshacer. El video se eliminará permanentemente.</p>
       <footer class="modal__actions">
-        <button class="modal__auth-btn" id="confirm-cancel">Cancelar</button>
-        <button class="modal__submit modal__submit--danger" id="confirm-ok">
-          Sí, eliminar
-        </button>
+        <button class="btn" id="confirm-cancel">Cancelar</button>
+        <button class="btn btn--danger" id="confirm-ok">Sí, eliminar</button>
       </footer>
     </section>
   </dialog>
@@ -211,7 +180,8 @@
   <footer class="footer">
     <a class="footer__github" href="https://github.com/mat1520" target="_blank" rel="noopener noreferrer">
       <svg class="footer__icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        <path
+          d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
       </svg>
       mat1520
     </a>
@@ -227,9 +197,7 @@
       </figure>
       <header class="video-card__body">
         <h3 class="video-card__title"></h3>
-        <p class="video-card__meta">
-          <span class="video-card__category"></span>
-        </p>
+        <p class="video-card__meta"><span class="video-card__category"></span></p>
       </header>
     </article>
   </template>
