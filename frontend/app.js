@@ -200,7 +200,7 @@
     const content = dom.commentContent.value.trim();
     if (!content) return dom.commentContent.focus();
 
-    dom.commentForm.querySelector("button[type='submit']").disabled = true;
+    dom.commentForm.querySelector(".comment-form__submit").disabled = true;
     const optimistic = { id: Date.now(), video_id: state.currentVideo.id, author: state.user.username, content, created_at: new Date().toISOString() };
     
     if (dom.commentsList.querySelector(".state-msg")) clear(dom.commentsList);
@@ -218,7 +218,7 @@
       dom.commentsCount.textContent = `(${state.currentVideo.comments.length})`;
       dom.commentContent.value = content;
       showToast(err.message || "Error al enviar", "error");
-    } finally { dom.commentForm.querySelector("button[type='submit']").disabled = false; }
+    } finally { dom.commentForm.querySelector(".comment-form__submit").disabled = false; }
   };
 
   const renderState = (container, msg, retryFn) => {

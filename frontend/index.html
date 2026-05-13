@@ -20,11 +20,11 @@
       <span class="header__spacer"></span>
       <section class="header__auth" id="auth-section">
         <button class="header__auth-btn" id="btn-login">Iniciar Sesión</button>
-        <button class="btn-accent" id="btn-register">Registro</button>
+        <button class="header__auth-btn header__auth-btn--accent" id="btn-register">Registro</button>
       </section>
       <section class="header__user view--hidden" id="user-section">
         <span class="header__username" id="header-username"></span>
-        <button class="btn-accent" id="btn-upload-open">Subir Video</button>
+        <button class="header__auth-btn header__auth-btn--accent" id="btn-upload-open">Subir Video</button>
         <button class="header__auth-btn" id="btn-logout">Salir</button>
       </section>
     </nav>
@@ -49,7 +49,7 @@
         <header class="player__info">
           <div class="player__title-row">
             <h1 class="player__title" id="player-title"></h1>
-            <button class="btn-danger view--hidden" id="btn-delete-video" aria-label="Eliminar video">Eliminar</button>
+            <button class="player__delete view--hidden" id="btn-delete-video" aria-label="Eliminar video">Eliminar</button>
           </div>
           <p class="player__meta" id="player-meta"></p>
           <p class="player__description" id="player-description"></p>
@@ -62,12 +62,12 @@
         <form class="comment-form view--hidden" id="comment-form">
           <textarea class="comment-form__textarea" id="comment-content" placeholder="Escribe un comentario..." maxlength="1000" required aria-label="Contenido del comentario"></textarea>
           <footer class="comment-form__actions">
-            <button class="btn-accent" type="submit">Comentar</button>
+            <button class="comment-form__submit" type="submit">Comentar</button>
           </footer>
         </form>
         <div class="comment-auth-prompt" id="comment-auth-prompt">
           <p>Inicia sesión para poder comentar.</p>
-          <button class="btn-accent" id="btn-prompt-login">Iniciar Sesión</button>
+          <button class="header__auth-btn header__auth-btn--accent" id="btn-prompt-login">Iniciar Sesión</button>
         </div>
 
         <ol class="comments__list" id="comments-list"></ol>
@@ -101,7 +101,7 @@
           <input class="modal__input" id="auth-password" type="password" minlength="6" required autocomplete="current-password">
         </fieldset>
         <p class="modal__error view--hidden" id="auth-error"></p>
-        <button class="btn-accent" type="submit" id="auth-submit">Entrar</button>
+        <button class="modal__submit" type="submit" id="auth-submit">Entrar</button>
       </form>
       <footer class="modal__footer">
         <p class="modal__switch" id="modal-switch"></p>
@@ -150,7 +150,7 @@
           <span class="upload-progress__text" id="upload-text">0%</span>
         </section>
         <p class="modal__error view--hidden" id="upload-error"></p>
-        <button class="btn-accent" type="submit" id="upload-submit">Subir</button>
+        <button class="modal__submit" type="submit" id="upload-submit">Subir</button>
       </form>
     </section>
   </dialog>
@@ -162,8 +162,8 @@
       </header>
       <p class="modal__text">Esta acción no se puede deshacer. El video se eliminará permanentemente.</p>
       <footer class="modal__actions">
-        <button id="confirm-cancel">Cancelar</button>
-        <button class="btn-danger" id="confirm-ok">Sí, eliminar</button>
+        <button class="modal__auth-btn" id="confirm-cancel">Cancelar</button>
+        <button class="modal__submit modal__submit--danger" id="confirm-ok">Sí, eliminar</button>
       </footer>
     </section>
   </dialog>
