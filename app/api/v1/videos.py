@@ -8,7 +8,7 @@ from sqlmodel import Session
 from app.core.auth import get_current_user
 from app.core.database import get_session
 from app.models.user import User
-from app.schemas.video import VideoRead, VideoDetail
+from app.schemas.video import VideoRead, VideoDetail, CategoryRead
 from app.services.video_service import VideoService
 from app.services.s3_service import get_s3_service, S3Service
 
@@ -39,6 +39,11 @@ def list_videos(
 @router.get("/random-picks", response_model=dict[str, list[VideoRead]])
 def random_picks(service: VideoService = Depends(get_video_service_dep)):
     return service.get_random_picks()
+
+
+@router.get("/categories", response_model=list[CategoryRead])
+def get_categories(service: VideoService = Depends(get_video_service_dep)):
+    return service.get_categories()
 
 
 @router.get("/{video_id}", response_model=VideoDetail)

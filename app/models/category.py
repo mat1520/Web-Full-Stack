@@ -10,4 +10,4 @@ class Category(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(max_length=50, unique=True, index=True)
 
-    videos: list["Video"] = Relationship(back_populates="category")
+    videos: list["Video"] = Relationship(back_populates="category_rel")

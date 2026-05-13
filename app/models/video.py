@@ -29,4 +29,8 @@ class Video(SQLModel, table=True):
 
     comments: list["Comment"] = Relationship(back_populates="video")
     owner: Optional["User"] = Relationship(back_populates="videos")
-    category: Optional["Category"] = Relationship(back_populates="videos")
+    category_rel: Optional["Category"] = Relationship(back_populates="videos")
+
+    @property
+    def category(self) -> str:
+        return self.category_rel.name if self.category_rel else ""
